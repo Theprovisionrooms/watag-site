@@ -1,0 +1,11 @@
+# WATAG — built by Sidedoor Digital
+# Intellectual property of Sidedoor Digital
+
+name = "watag"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-06-23"
+
+[[d1_databases]]
+binding = "WATAG_DB"
+database_name = "watag-db"
+database_id = "REPLACE_WITH_ID_FROM_WRANGLER_D1_CREATE"

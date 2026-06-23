@@ -1,0 +1,19 @@
+/* WATAG — built by Sidedoor Digital
+   Intellectual property of Sidedoor Digital
+   Brand tokens pulled from the WATAG asset kit (rabbit mark, vapor grid, sticker sheet) */
+
+:root {
+  --watag-bg: #0A0A12;
+  --watag-bg-raised: #14141f;
+  --watag-pink: #E91E8C;
+  --watag-pink-deep: #C2105F;
+  --watag-cyan: #00E5FF;
+  --watag-amber: #F2B033;
+  --watag-purple: #6A2FB0;
+  --watag-text: #F5F5FA;
+  --watag-text-dim: #9A9AB0;
+  --watag-border: rgba(0, 229, 255, 0.25);
+
+  --watag-font-display: "Barlow Condensed", sans-serif;
+  --watag-font-body: "Inter", sans-serif;
+}
