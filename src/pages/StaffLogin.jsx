@@ -36,7 +36,7 @@ export default function StaffLogin() {
     localStorage.setItem("watag_staff_id", data.staffId);
     localStorage.setItem("watag_staff_name", data.name);
     localStorage.setItem("watag_staff_color", data.calendarColor);
-    navigate("/staff/scan");
+    navigate("/staff/home");
   };
 
   if (!selected) {

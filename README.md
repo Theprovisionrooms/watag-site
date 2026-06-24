@@ -132,9 +132,7 @@ Rabbit-in-sunglasses logo as the focal mark. Cyberpunk/vapor aesthetic: deep bla
 
 ## next steps
 
-Loyalty loop is built end to end: client passport screen with self refreshing QR and stamp progress, staff scanner with camera decode and tier rewards, all wired to D1. That's the feature Jay wants pushed hardest, done.
-
-Next up: staff gallery upload, the per-staff colour coded calendar view (the API's built, needs the actual calendar UI), and the enquiry thread screens.
+Loyalty loop and staff gallery are built end to end. Next up: the colour coded calendar UI (the availability API's already there, just needs the view on top), then the enquiry thread screens, the biggest remaining piece.
 
 ---
 Intellectual property of Sidedoor Digital.

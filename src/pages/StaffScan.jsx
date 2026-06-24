@@ -109,7 +109,7 @@ export default function StaffScan() {
 
   return (
     <div className="watag-screen">
-      <NavBack to="/staff" label="staff" />
+      <NavBack to="/staff/home" label="staff" />
       <h1>Scan card</h1>
 
       <div

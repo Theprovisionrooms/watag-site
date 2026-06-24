@@ -9,3 +9,7 @@ compatibility_date = "2026-06-23"
 binding = "WATAG_DB"
 database_name = "watag-db"
 database_id = "a055f1cf-2ea9-4327-9ed9-881522a3c38d"
+
+[[r2_buckets]]
+binding = "WATAG_MEDIA"
+bucket_name = "watag-media"
