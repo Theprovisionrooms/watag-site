@@ -59,21 +59,33 @@ Collapsed to one provider rather than running Vercel + Supabase + Cloudflare sid
 
 ```
 watag/
+├── index.html
+├── vite.config.js           PWA manifest generated from here
 ├── public/
-│   ├── manifest.json       PWA manifest
-│   └── icons/              app icons (rabbit logo, needs square exports)
+│   └── icons/                app icons (rabbit logo, needs square exports)
 ├── src/
+│   ├── main.jsx
+│   ├── App.jsx
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   ├── ClientLoyaltyCard.jsx   the loyalty passport, QR + stamp progress
+│   │   ├── StaffLogin.jsx
+│   │   └── StaffScan.jsx           camera scanner, stamps the card
 │   └── styles/
-│       └── tokens.css      brand colour variables
+│       ├── tokens.css        brand colour variables
+│       └── global.css        resets, glitch effect, shared layout classes
 ├── functions/
 │   └── api/
 │       ├── loyalty/
-│       │   ├── qr-generate.js
-│       │   └── scan.js
+│       │   ├── qr-generate.js     rotating token for the client's QR
+│       │   ├── scan.js            staff side, applies the stamp
+│       │   └── card.js            client side, current stamp count
 │       └── staff/
 │           ├── availability.js
-│           └── settings.js
+│           ├── settings.js        staff pick their own calendar colour
+│           └── login.js           PIN login
 ├── schema.sql               D1 schema, full data model
+├── seed.sql                  3 placeholder staff accounts, default pin 1234
 ├── wrangler.toml
 ├── package.json
 └── LICENSE
@@ -96,6 +108,10 @@ wrangler d1 execute watag-db --file=./schema.sql
 ```
 
 ```
+wrangler d1 execute watag-db --file=./seed.sql
+```
+
+```
 npm run dev
 ```
 
@@ -109,12 +125,16 @@ Rabbit-in-sunglasses logo as the focal mark. Cyberpunk/vapor aesthetic: deep bla
 
 ## open items
 
-- Square icon exports of the rabbit logo at 192px and 512px for the manifest (current asset is fine for in-app use but not pre-cropped for icon slots).
-- Live (or near-live) sign-off from Jay on the merch list that's loyalty-eligible at the 6 stamp tier.
+- Square icon exports of the rabbit logo at 192px and 512px, drop them in `public/icons/` as `icon-192.png` and `icon-512.png`. Current asset is the source file, fine for in-app use but not pre-cropped for the home screen icon slot.
+- Real client login. `ClientLoyaltyCard.jsx` currently has a placeholder email entry that always resolves to client id 1, needs wiring to the magic link / Resend flow once that's built.
+- Live sign-off from Jay on the merch list that's loyalty-eligible at the 6 stamp tier.
+- Staff roster in `StaffLogin.jsx` is 3 placeholder names matching `seed.sql`, swap for real names and reset PINs once Jay's ready.
 
 ## next steps
 
-Schema and repo scaffold are in place. Next is the page build, starting with the client loyalty screen (QR display) and the staff scan view, since that's the feature Jay wants pushed hardest.
+Loyalty loop is built end to end: client passport screen with self refreshing QR and stamp progress, staff scanner with camera decode and tier rewards, all wired to D1. That's the feature Jay wants pushed hardest, done.
+
+Next up: staff gallery upload, the per-staff colour coded calendar view (the API's built, needs the actual calendar UI), and the enquiry thread screens.
 
 ---
 Intellectual property of Sidedoor Digital.
