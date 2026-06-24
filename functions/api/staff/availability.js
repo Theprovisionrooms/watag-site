@@ -58,3 +58,20 @@ export async function onRequestPost({ request, env }) {
     headers: { "content-type": "application/json" },
   });
 }
+
+export async function onRequestDelete({ request, env }) {
+  const { id } = await request.json();
+
+  if (!id) {
+    return new Response(JSON.stringify({ error: "id required" }), {
+      status: 400,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
+  await env.WATAG_DB.prepare(`DELETE FROM staff_availability WHERE id = ?`).bind(id).run();
+
+  return new Response(JSON.stringify({ deleted: true }), {
+    headers: { "content-type": "application/json" },
+  });
+}

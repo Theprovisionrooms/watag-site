@@ -4,22 +4,23 @@
 // Staff pick their own name then enter their PIN. With 3 staff this is
 // simpler than a username field, swap for proper accounts if the team grows.
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavBack } from "../App.jsx";
 
-// placeholder roster, replace ids/names once seeded for real
-const STAFF_ROSTER = [
-  { id: 1, name: "Staff One" },
-  { id: 2, name: "Staff Two" },
-  { id: 3, name: "Staff Three" },
-];
-
 export default function StaffLogin() {
+  const [roster, setRoster] = useState([]);
   const [selected, setSelected] = useState(null);
   const [pin, setPin] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch("/api/staff/list")
+      .then((res) => res.json())
+      .then(setRoster)
+      .catch(() => setRoster([]));
+  }, []);
 
   const submit = async () => {
     setError(null);
@@ -45,7 +46,7 @@ export default function StaffLogin() {
         <NavBack />
         <h1>Who's on</h1>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {STAFF_ROSTER.map((s) => (
+          {roster.map((s) => (
             <button
               key={s.id}
               className="watag-card"

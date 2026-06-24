@@ -15,6 +15,9 @@ export default function Home() {
         <Link to="/card" style={{ color: "var(--watag-pink)", fontWeight: 600 }}>
           View your loyalty card →
         </Link>
+        <Link to="/calendar" style={{ color: "var(--watag-amber)", fontWeight: 600 }}>
+          See who's working →
+        </Link>
         <Link to="/staff" style={{ color: "var(--watag-cyan)", fontWeight: 600 }}>
           Staff login →
         </Link>
