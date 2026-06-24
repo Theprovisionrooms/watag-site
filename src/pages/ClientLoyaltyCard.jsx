@@ -1,9 +1,10 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 //
-// Client loyalty passport. Shows stamp progress toward the 3/6/9 tiers
-// and a QR code that rotates every 60 seconds so an old screenshot
-// can't be reused to fake a stamp.
+// Client loyalty passport. Verification (email code) only happens once
+// per device, the session token is then stored and reused silently on
+// every visit after that, same low friction as before, just with a
+// real check the first time.
 
 import { useState, useEffect, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
@@ -16,40 +17,103 @@ const TIERS = [
   { count: 9, label: "3hr session" },
 ];
 
-function useClientId() {
-  const [clientId, setClientId] = useState(() => localStorage.getItem("watag_client_id") || "");
+function useSession() {
+  const [session, setSession] = useState(() => ({
+    token: localStorage.getItem("watag_session_token") || "",
+    name: localStorage.getItem("watag_client_name") || "",
+  }));
 
-  const save = (id) => {
-    localStorage.setItem("watag_client_id", id);
-    setClientId(id);
+  const save = (token, name) => {
+    localStorage.setItem("watag_session_token", token);
+    localStorage.setItem("watag_client_name", name);
+    setSession({ token, name });
   };
 
-  return [clientId, save];
+  const clear = () => {
+    localStorage.removeItem("watag_session_token");
+    localStorage.removeItem("watag_client_name");
+    setSession({ token: "", name: "" });
+  };
+
+  return { ...session, save, clear };
 }
 
-function ProfileEntry({ onAccess }) {
+function ProfileEntry({ onVerified }) {
+  const [step, setStep] = useState("details"); // details | code
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const submit = async () => {
+  const requestCode = async () => {
     setError(null);
+    if (!email.includes("@")) {
+      setError("enter a valid email");
+      return;
+    }
     setSubmitting(true);
-    const res = await fetch("/api/clients/access", {
+    const res = await fetch("/api/clients/request-code", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name, phone }),
+      body: JSON.stringify({ email }),
+    });
+    setSubmitting(false);
+    if (!res.ok) {
+      setError("couldn't send the code, try again");
+      return;
+    }
+    setStep("code");
+  };
+
+  const verifyCode = async () => {
+    setError(null);
+    setSubmitting(true);
+    const res = await fetch("/api/clients/verify-code", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email, code, name, phone }),
     });
     const data = await res.json();
     setSubmitting(false);
     if (!res.ok) {
-      setError(data.error || "something went wrong, try again");
+      setError(data.error === "invalid_or_expired_code" ? "wrong code, check your email and try again" : data.error || "something went wrong");
       return;
     }
-    localStorage.setItem("watag_client_name", data.name);
-    onAccess(String(data.clientId));
+    onVerified(data.token, data.name);
   };
+
+  if (step === "code") {
+    return (
+      <div className="watag-screen">
+        <NavBack />
+        <span className="watag-eyebrow">Check your email</span>
+        <h1>Enter your code</h1>
+        <p style={{ color: "var(--watag-text-dim)" }}>Sent to {email}, expires in 10 minutes.</p>
+        <div className="watag-card" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <input
+            type="text"
+            inputMode="numeric"
+            autoFocus
+            placeholder="6 digit code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && verifyCode()}
+            style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 12, borderRadius: 8, fontSize: 20, letterSpacing: 4, textAlign: "center" }}
+          />
+          {error && <span style={{ color: "var(--watag-pink)", fontSize: 13 }}>{error}</span>}
+          <button
+            onClick={verifyCode}
+            disabled={submitting}
+            style={{ background: "var(--watag-pink)", color: "#fff", border: "none", borderRadius: 8, padding: 14, fontWeight: 700 }}
+          >
+            {submitting ? "checking..." : "verify"}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="watag-screen">
@@ -57,7 +121,7 @@ function ProfileEntry({ onAccess }) {
       <span className="watag-eyebrow">Your card</span>
       <h1>Find your card</h1>
       <p style={{ color: "var(--watag-text-dim)" }}>
-        First time, this sets up your card. Been before, just pop in the same phone number and you're straight back in.
+        This is only needed once on this phone. After this you're straight in every time, no code, no typing.
       </p>
       <div className="watag-card" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <input
@@ -72,16 +136,23 @@ function ProfileEntry({ onAccess }) {
           placeholder="phone number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
+          style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 12, borderRadius: 8 }}
+        />
+        <input
+          type="email"
+          placeholder="email, for your one-time code"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && requestCode()}
           style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 12, borderRadius: 8 }}
         />
         {error && <span style={{ color: "var(--watag-pink)", fontSize: 13 }}>{error}</span>}
         <button
-          onClick={submit}
+          onClick={requestCode}
           disabled={submitting}
           style={{ background: "var(--watag-pink)", color: "#fff", border: "none", borderRadius: 8, padding: 14, fontWeight: 700 }}
         >
-          {submitting ? "one sec..." : "find my card"}
+          {submitting ? "sending..." : "send my code"}
         </button>
       </div>
     </div>
@@ -89,15 +160,21 @@ function ProfileEntry({ onAccess }) {
 }
 
 export default function ClientLoyaltyCard() {
-  const [clientId, setClientId] = useClientId();
+  const { token, name, save, clear } = useSession();
   const [stampCount, setStampCount] = useState(0);
   const [pendingReward, setPendingReward] = useState(null);
-  const [token, setToken] = useState(null);
+  const [qrToken, setQrToken] = useState(null);
   const [secondsLeft, setSecondsLeft] = useState(TOKEN_TTL);
   const [justStamped, setJustStamped] = useState(false);
 
-  const fetchCard = useCallback(async (id) => {
-    const res = await fetch(`/api/loyalty/card?clientId=${id}`);
+  const authHeaders = useCallback(() => ({ Authorization: `Bearer ${token}` }), [token]);
+
+  const fetchCard = useCallback(async () => {
+    const res = await fetch("/api/loyalty/card", { headers: authHeaders() });
+    if (res.status === 401) {
+      clear();
+      return;
+    }
     if (!res.ok) return;
     const data = await res.json();
     setStampCount((prev) => {
@@ -105,36 +182,35 @@ export default function ClientLoyaltyCard() {
       return data.stampCount;
     });
     setPendingReward(data.pendingReward);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
-  const refreshToken = useCallback(async (id) => {
-    const res = await fetch("/api/loyalty/qr-generate", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ clientId: id }),
-    });
+  const refreshQrToken = useCallback(async () => {
+    const res = await fetch("/api/loyalty/qr-generate", { method: "POST", headers: authHeaders() });
+    if (res.status === 401) {
+      clear();
+      return;
+    }
     if (!res.ok) return;
     const data = await res.json();
-    setToken(data.token);
+    setQrToken(data.token);
     setSecondsLeft(TOKEN_TTL);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
-  // initial load and token rotation
   useEffect(() => {
-    if (!clientId) return;
-    fetchCard(clientId);
-    refreshToken(clientId);
+    if (!token) return;
+    fetchCard();
+    refreshQrToken();
 
-    const tokenInterval = setInterval(() => refreshToken(clientId), TOKEN_TTL * 1000);
-    // poll the card status a little more often than the token, catches a stamp
-    // that just landed while this screen is open
-    const cardInterval = setInterval(() => fetchCard(clientId), 5000);
+    const tokenInterval = setInterval(refreshQrToken, TOKEN_TTL * 1000);
+    const cardInterval = setInterval(fetchCard, 5000);
 
     return () => {
       clearInterval(tokenInterval);
       clearInterval(cardInterval);
     };
-  }, [clientId, fetchCard, refreshToken]);
+  }, [token, fetchCard, refreshQrToken]);
 
   useEffect(() => {
     const tick = setInterval(() => setSecondsLeft((s) => Math.max(s - 1, 0)), 1000);
@@ -147,8 +223,8 @@ export default function ClientLoyaltyCard() {
     return () => clearTimeout(t);
   }, [justStamped]);
 
-  if (!clientId) {
-    return <ProfileEntry onAccess={setClientId} />;
+  if (!token) {
+    return <ProfileEntry onVerified={save} />;
   }
 
   const ringProgress = secondsLeft / TOKEN_TTL;
@@ -158,7 +234,7 @@ export default function ClientLoyaltyCard() {
     <div className="watag-screen">
       <NavBack />
       <span className="watag-eyebrow">Loyalty passport</span>
-      <h1 style={{ fontSize: 32 }}>Your card</h1>
+      <h1 style={{ fontSize: 32 }}>{name ? `${name}'s card` : "Your card"}</h1>
 
       {pendingReward && (
         <div className="watag-card" style={{ borderColor: "var(--watag-amber)" }}>
@@ -203,7 +279,7 @@ export default function ClientLoyaltyCard() {
               justifyContent: "center",
             }}
           >
-            {token ? <QRCodeSVG value={token} size={160} /> : <span style={{ color: "#000" }}>loading</span>}
+            {qrToken ? <QRCodeSVG value={qrToken} size={160} /> : <span style={{ color: "#000" }}>loading</span>}
           </div>
         </div>
       </div>
@@ -237,14 +313,7 @@ export default function ClientLoyaltyCard() {
         </div>
       </div>
 
-      <button
-        onClick={() => {
-          localStorage.removeItem("watag_client_id");
-          localStorage.removeItem("watag_client_name");
-          setClientId("");
-        }}
-        style={{ background: "none", border: "none", color: "var(--watag-text-dim)", fontSize: 12 }}
-      >
+      <button onClick={clear} style={{ background: "none", border: "none", color: "var(--watag-text-dim)", fontSize: 12 }}>
         not you? switch profile
       </button>
     </div>

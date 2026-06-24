@@ -1,17 +1,19 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 //
-// GET /api/loyalty/card?clientId=1
-// Returns the client's current stamp count and any pending reward,
-// used to render the loyalty passport screen.
+// GET /api/loyalty/card
+// Header: Authorization: Bearer <session token>
+// Returns the signed-in client's stamp count and pending reward.
+// No longer takes a clientId from the caller, that was spoofable.
+
+import { resolveClientSession } from "../../_lib/session.js";
 
 export async function onRequestGet({ request, env }) {
-  const url = new URL(request.url);
-  const clientId = url.searchParams.get("clientId");
+  const clientId = await resolveClientSession(request, env);
 
   if (!clientId) {
-    return new Response(JSON.stringify({ error: "clientId required" }), {
-      status: 400,
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
       headers: { "content-type": "application/json" },
     });
   }

@@ -127,12 +127,20 @@ Rabbit-in-sunglasses logo as the focal mark. Cyberpunk/vapor aesthetic: deep bla
 
 - Square icon exports of the rabbit logo at 192px and 512px, drop them in `public/icons/` as `icon-192.png` and `icon-512.png`. Current asset is the source file, fine for in-app use but not pre-cropped for the home screen icon slot.
 - Live sign-off from Jay on the merch list that's loyalty-eligible at the 6 stamp tier.
+- `RESEND_API_KEY` needs setting as a secret (`wrangler secret put RESEND_API_KEY --remote`) before the email code can actually send.
+- `request-code.js` sends from a placeholder address (`noreply@watag.co.uk`), needs swapping for whatever domain is actually verified in the Resend dashboard.
+
+## security note
+
+Client sign-in is now a one-time email code per device, not a typed-in phone number. First visit on a phone needs the code, every visit after that is instant, the session token just sits on the device and gets reused silently. Phone number's still collected and shown on the profile, it's just not the thing that proves who someone is anymore, email is.
+
+Card and QR endpoints now resolve the signed-in client from that session token server side, rather than trusting an id sent up from the browser. Closes the gap where anyone could've typed in a different account's id and seen someone else's stamp count.
 
 ## next steps
 
-Loyalty loop, staff gallery, colour coded rota, and real client profiles (name + phone, no password, profile not security) are all built and wired together. Clients now get a real account on first visit to `/card` instead of the old placeholder.
+Loyalty loop, staff gallery, colour coded rota, and client accounts (now with real verification) are all built and wired together.
 
-Next up: the enquiry thread screens, now unblocked since there's a real client id behind every visitor.
+Next up: the enquiry thread screens, now unblocked since there's a real, verified client id behind every visitor.
 
 ---
 Intellectual property of Sidedoor Digital.

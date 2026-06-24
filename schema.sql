@@ -50,10 +50,31 @@ CREATE TABLE staff_social_links (
 CREATE TABLE clients (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
-  phone TEXT UNIQUE NOT NULL,
-  email TEXT,
+  email TEXT UNIQUE NOT NULL,
+  phone TEXT NOT NULL,
   created_at TEXT DEFAULT (datetime('now'))
 );
+
+CREATE TABLE client_verification_codes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL,
+  code TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  used_at TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX idx_verification_codes_email ON client_verification_codes(email);
+
+CREATE TABLE client_sessions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  client_id INTEGER NOT NULL REFERENCES clients(id),
+  token TEXT UNIQUE NOT NULL,
+  expires_at TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX idx_client_sessions_token ON client_sessions(token);
 
 -- ===================== LOYALTY =====================
 

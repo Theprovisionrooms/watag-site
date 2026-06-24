@@ -2,10 +2,14 @@
 // Intellectual property of Sidedoor Digital
 //
 // POST /api/loyalty/qr-generate
-// Called when a client opens their loyalty card screen.
-// Returns a short lived, single use token to encode into the QR code.
-// Token rotates every time this is called, so a screenshot of an old
-// QR code cannot be reused to fake a stamp later.
+// Header: Authorization: Bearer <session token>
+// Called when a client opens their loyalty card screen. Returns a
+// short lived, single use token to encode into the QR code, rotates
+// every time this is called so an old screenshot can't be reused.
+// Resolves the client from the session token now, not a caller
+// supplied clientId, that was spoofable.
+
+import { resolveClientSession } from "../../_lib/session.js";
 
 const TOKEN_TTL_SECONDS = 60;
 
@@ -15,11 +19,11 @@ function randomToken() {
 }
 
 export async function onRequestPost({ request, env }) {
-  const { clientId } = await request.json();
+  const clientId = await resolveClientSession(request, env);
 
   if (!clientId) {
-    return new Response(JSON.stringify({ error: "clientId required" }), {
-      status: 400,
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
       headers: { "content-type": "application/json" },
     });
   }
