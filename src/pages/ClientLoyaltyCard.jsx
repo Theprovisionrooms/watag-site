@@ -27,6 +27,67 @@ function useClientId() {
   return [clientId, save];
 }
 
+function ProfileEntry({ onAccess }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async () => {
+    setError(null);
+    setSubmitting(true);
+    const res = await fetch("/api/clients/access", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name, phone }),
+    });
+    const data = await res.json();
+    setSubmitting(false);
+    if (!res.ok) {
+      setError(data.error || "something went wrong, try again");
+      return;
+    }
+    localStorage.setItem("watag_client_name", data.name);
+    onAccess(String(data.clientId));
+  };
+
+  return (
+    <div className="watag-screen">
+      <NavBack />
+      <span className="watag-eyebrow">Your card</span>
+      <h1>Find your card</h1>
+      <p style={{ color: "var(--watag-text-dim)" }}>
+        First time, this sets up your card. Been before, just pop in the same phone number and you're straight back in.
+      </p>
+      <div className="watag-card" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <input
+          type="text"
+          placeholder="your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 12, borderRadius: 8 }}
+        />
+        <input
+          type="tel"
+          placeholder="phone number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+          style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 12, borderRadius: 8 }}
+        />
+        {error && <span style={{ color: "var(--watag-pink)", fontSize: 13 }}>{error}</span>}
+        <button
+          onClick={submit}
+          disabled={submitting}
+          style={{ background: "var(--watag-pink)", color: "#fff", border: "none", borderRadius: 8, padding: 14, fontWeight: 700 }}
+        >
+          {submitting ? "one sec..." : "find my card"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ClientLoyaltyCard() {
   const [clientId, setClientId] = useClientId();
   const [stampCount, setStampCount] = useState(0);
@@ -87,25 +148,7 @@ export default function ClientLoyaltyCard() {
   }, [justStamped]);
 
   if (!clientId) {
-    return (
-      <div className="watag-screen">
-        <NavBack />
-        <h1>Find your card</h1>
-        <p style={{ color: "var(--watag-text-dim)" }}>
-          Enter the email you booked with to pull up your loyalty card.
-          This screen is a placeholder until magic link login is wired in.
-        </p>
-        <input
-          type="email"
-          placeholder="you@email.com"
-          className="watag-card"
-          style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 12 }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") setClientId("1"); // placeholder lookup, real version resolves email -> clientId server side
-          }}
-        />
-      </div>
-    );
+    return <ProfileEntry onAccess={setClientId} />;
   }
 
   const ringProgress = secondsLeft / TOKEN_TTL;
@@ -193,6 +236,17 @@ export default function ClientLoyaltyCard() {
           ))}
         </div>
       </div>
+
+      <button
+        onClick={() => {
+          localStorage.removeItem("watag_client_id");
+          localStorage.removeItem("watag_client_name");
+          setClientId("");
+        }}
+        style={{ background: "none", border: "none", color: "var(--watag-text-dim)", fontSize: 12 }}
+      >
+        not you? switch profile
+      </button>
     </div>
   );
 }

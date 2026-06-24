@@ -50,18 +50,8 @@ CREATE TABLE staff_social_links (
 CREATE TABLE clients (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  phone TEXT,
-  created_at TEXT DEFAULT (datetime('now'))
-);
-
--- magic link auth tokens, same pattern as Candymonium
-CREATE TABLE auth_tokens (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  client_id INTEGER NOT NULL REFERENCES clients(id),
-  token TEXT UNIQUE NOT NULL,
-  expires_at TEXT NOT NULL,
-  used_at TEXT,
+  phone TEXT UNIQUE NOT NULL,
+  email TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );
 

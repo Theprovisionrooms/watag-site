@@ -126,14 +126,13 @@ Rabbit-in-sunglasses logo as the focal mark. Cyberpunk/vapor aesthetic: deep bla
 ## open items
 
 - Square icon exports of the rabbit logo at 192px and 512px, drop them in `public/icons/` as `icon-192.png` and `icon-512.png`. Current asset is the source file, fine for in-app use but not pre-cropped for the home screen icon slot.
-- Real client login. `ClientLoyaltyCard.jsx` currently has a placeholder email entry that always resolves to client id 1, needs wiring to the magic link / Resend flow once that's built.
 - Live sign-off from Jay on the merch list that's loyalty-eligible at the 6 stamp tier.
 
 ## next steps
 
-Loyalty loop, staff gallery, and the colour coded rota are all built end to end. Staff pick their own colour and set their own slots at `/staff/availability`, clients see everyone's week at `/calendar`.
+Loyalty loop, staff gallery, colour coded rota, and real client profiles (name + phone, no password, profile not security) are all built and wired together. Clients now get a real account on first visit to `/card` instead of the old placeholder.
 
-Next up: the enquiry thread screens, the biggest remaining piece on the brief.
+Next up: the enquiry thread screens, now unblocked since there's a real client id behind every visitor.
 
 ---
 Intellectual property of Sidedoor Digital.
