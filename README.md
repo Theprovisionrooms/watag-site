@@ -129,6 +129,7 @@ Rabbit-in-sunglasses logo as the focal mark. Cyberpunk/vapor aesthetic: deep bla
 - Live sign-off from Jay on the merch list that's loyalty-eligible at the 6 stamp tier.
 - `RESEND_API_KEY` needs setting as a secret (`wrangler secret put RESEND_API_KEY --remote`) before the email code can actually send.
 - `request-code.js` sends from a placeholder address (`noreply@watag.co.uk`), needs swapping for whatever domain is actually verified in the Resend dashboard.
+- Enquiry threads are text only for v1. The schema's got a `gallery_ref_id` column ready for letting a client attach one of the artist's existing gallery photos as a reference, just needs the picker UI on top when there's time, low priority for now.
 
 ## security note
 
@@ -138,9 +139,9 @@ Card and QR endpoints now resolve the signed-in client from that session token s
 
 ## next steps
 
-Loyalty loop, staff gallery, colour coded rota, and client accounts (now with real verification) are all built and wired together.
+Loyalty loop, staff gallery, colour coded rota, verified client accounts, and enquiry threads are all built and wired together. That's every major feature group from the original brief.
 
-Next up: the enquiry thread screens, now unblocked since there's a real, verified client id behind every visitor.
+Remaining are the smaller additions from "the plan" (referral leaderboard, review nudge, waitlist, aftercare guide, stats dashboard, wallet pass, the shop) plus the two outstanding open items below. None of those need new architecture, they all hang off the client/staff records that already exist.
 
 ---
 Intellectual property of Sidedoor Digital.

@@ -37,3 +37,16 @@ export async function resolveClientSession(request, env) {
 
   return row ? row.client_id : null;
 }
+
+// works out whether the caller is a signed-in client or a staff member,
+// staff still just claim their own id (trusted, same as elsewhere in
+// the staff side, a closed set of known people with their own PIN login)
+export async function resolveViewer(request, env, { url, body } = {}) {
+  const clientId = await resolveClientSession(request, env);
+  if (clientId) return { type: "client", id: clientId };
+
+  const staffId = (url && url.searchParams.get("staffId")) || (body && body.staffId);
+  if (staffId) return { type: "staff", id: Number(staffId) };
+
+  return null;
+}

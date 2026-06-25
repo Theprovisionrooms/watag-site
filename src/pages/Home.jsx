@@ -18,6 +18,9 @@ export default function Home() {
         <Link to="/calendar" style={{ color: "var(--watag-amber)", fontWeight: 600 }}>
           See who's working →
         </Link>
+        <Link to="/messages" style={{ color: "var(--watag-purple)", fontWeight: 600 }}>
+          Message an artist →
+        </Link>
         <Link to="/staff" style={{ color: "var(--watag-cyan)", fontWeight: 600 }}>
           Staff login →
         </Link>

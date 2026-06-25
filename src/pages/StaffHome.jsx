@@ -31,6 +31,9 @@ export default function StaffHome() {
         <Link to="/staff/availability" className="watag-card" style={{ color: "var(--watag-amber)", fontWeight: 600, textDecoration: "none" }}>
           My availability →
         </Link>
+        <Link to="/staff/messages" className="watag-card" style={{ color: "var(--watag-purple)", fontWeight: 600, textDecoration: "none" }}>
+          Enquiries →
+        </Link>
       </div>
     </div>
   );
