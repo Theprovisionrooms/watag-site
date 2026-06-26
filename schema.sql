@@ -12,6 +12,9 @@ CREATE TABLE staff (
   email TEXT UNIQUE NOT NULL,
   pin_hash TEXT,                      -- staff login, simple PIN/password hash for v1
   calendar_color TEXT DEFAULT '#E91E8C',  -- chosen by the staff member themselves
+  role TEXT NOT NULL DEFAULT 'artist',    -- 'owner' | 'artist', owner gets the shop/money pages
+  bio TEXT,
+  photo_url TEXT,
   active INTEGER DEFAULT 1,
   created_at TEXT DEFAULT (datetime('now'))
 );

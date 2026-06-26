@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 export default function StaffHome() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
+  const [role, setRole] = useState("artist");
 
   useEffect(() => {
     const staffId = localStorage.getItem("watag_staff_id");
@@ -15,13 +16,17 @@ export default function StaffHome() {
       return;
     }
     setName(localStorage.getItem("watag_staff_name") || "");
+    setRole(localStorage.getItem("watag_staff_role") || "artist");
   }, [navigate]);
 
   return (
     <div className="watag-screen">
-      <span className="watag-eyebrow">Staff</span>
+      <span className="watag-eyebrow">Artist</span>
       <h1>Hey {name}</h1>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <Link to="/staff/profile" className="watag-card" style={{ color: "var(--watag-pink)", fontWeight: 600, textDecoration: "none" }}>
+          My profile →
+        </Link>
         <Link to="/staff/scan" className="watag-card" style={{ color: "var(--watag-pink)", fontWeight: 600, textDecoration: "none" }}>
           Scan loyalty card →
         </Link>
@@ -34,6 +39,11 @@ export default function StaffHome() {
         <Link to="/staff/messages" className="watag-card" style={{ color: "var(--watag-purple)", fontWeight: 600, textDecoration: "none" }}>
           Enquiries →
         </Link>
+        {role === "owner" && (
+          <Link to="/staff/products" className="watag-card" style={{ color: "var(--watag-cyan)", fontWeight: 600, textDecoration: "none" }}>
+            Manage shop →
+          </Link>
+        )}
       </div>
     </div>
   );

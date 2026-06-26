@@ -41,16 +41,6 @@ export default function StaffAvailability() {
     if (res.ok) setBlocks(await res.json());
   }
 
-  async function saveColor(newColor) {
-    setColor(newColor);
-    localStorage.setItem("watag_staff_color", newColor);
-    await fetch("/api/staff/settings", {
-      method: "PATCH",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ staffId, calendarColor: newColor }),
-    });
-  }
-
   async function addBlock() {
     setSaving(true);
     await fetch("/api/staff/availability", {
@@ -73,18 +63,11 @@ export default function StaffAvailability() {
 
   return (
     <div className="watag-screen">
-      <NavBack to="/staff/home" label="staff" />
+      <NavBack to="/staff/home" label="artist" />
       <h1>My availability</h1>
-
-      <div className="watag-card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ color: "var(--watag-text-dim)" }}>My calendar colour</span>
-        <input
-          type="color"
-          value={color}
-          onChange={(e) => saveColor(e.target.value)}
-          style={{ width: 44, height: 32, border: "none", borderRadius: 6, background: "none" }}
-        />
-      </div>
+      <p style={{ color: "var(--watag-text-dim)", fontSize: 13, margin: 0 }}>
+        Want to change your colour, name, or bio? That's on <a href="/staff/profile" style={{ color: "var(--watag-cyan)" }}>my profile</a> now.
+      </p>
 
       <div className="watag-card" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <strong>Add a slot</strong>

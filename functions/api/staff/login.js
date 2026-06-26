@@ -24,7 +24,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   const staff = await env.WATAG_DB.prepare(
-    `SELECT id, name, calendar_color, pin_hash FROM staff WHERE id = ? AND active = 1`
+    `SELECT id, name, calendar_color, role, pin_hash FROM staff WHERE id = ? AND active = 1`
   )
     .bind(staffId)
     .first();
@@ -46,7 +46,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   return new Response(
-    JSON.stringify({ staffId: staff.id, name: staff.name, calendarColor: staff.calendar_color }),
+    JSON.stringify({ staffId: staff.id, name: staff.name, calendarColor: staff.calendar_color, role: staff.role }),
     { headers: { "content-type": "application/json" } }
   );
 }

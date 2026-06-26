@@ -126,10 +126,22 @@ Rabbit-in-sunglasses logo as the focal mark. Cyberpunk/vapor aesthetic: deep bla
 ## open items
 
 - Square icon exports of the rabbit logo at 192px and 512px, drop them in `public/icons/` as `icon-192.png` and `icon-512.png`. Current asset is the source file, fine for in-app use but not pre-cropped for the home screen icon slot.
-- Live sign-off from Jay on the merch list that's loyalty-eligible at the 6 stamp tier.
-- `RESEND_API_KEY` needs setting as a secret (`wrangler secret put RESEND_API_KEY --remote`) before the email code can actually send.
-- `request-code.js` sends from a placeholder address (`noreply@watag.co.uk`), needs swapping for whatever domain is actually verified in the Resend dashboard.
+- Live sign-off from Jay on the merch list that's loyalty-eligible at the 6 stamp tier, the checkbox exists in the staff product form now, just needs him deciding which items it applies to.
+- `RESEND_API_KEY` needs setting as a secret before the email code or order confirmation emails can actually send, set against the Pages project: `wrangler pages secret put RESEND_API_KEY --project-name=YOUR-PROJECT-NAME`.
+- `request-code.js` and `webhook.js` both currently send from Resend's test domain, swap for a real verified domain once one's set up in the Resend dashboard.
 - Enquiry threads are text only for v1. The schema's got a `gallery_ref_id` column ready for letting a client attach one of the artist's existing gallery photos as a reference, just needs the picker UI on top when there's time, low priority for now.
+- Shop assumes pickup in studio, not delivery. Easy to add shipping later, the schema doesn't change either way, just flagging it was an assumption, not a confirmed decision from Jay.
+- **Migration 004 assumes staff id 1 is Jay** and marks that row as `owner`. Check it landed on the right person once it's live, if not just re-run `UPDATE staff SET role = 'owner' WHERE id = X` with the correct id, no harm done either way.
+
+## artists, ownership, and roles
+
+"Staff" is now "Artists" everywhere a client or artist actually sees text. The code underneath still says `staff` throughout (tables, routes, function names), renaming all of that for a label change wasn't worth the risk, what matters is what shows on screen, not the folder structure.
+
+Each artist edits their own name, bio, and photo at `/staff/profile`, that's the one place all of it lives now, the colour picker moved there too from the old availability page.
+
+Two roles exist on the `staff` table: `owner` and `artist`. Jay's the only `owner`. That role gates the shop management page and its underlying endpoints, both in the UI (an artist won't even see the "Manage shop" link) and on the server (the endpoint checks the role itself, doesn't just trust the frontend to hide the button). Worth knowing honestly: the product endpoints had **no permission check at all** before this, anyone with the right URL could've added or removed stock. That's closed now, not a new gap, an existing one finally locked down.
+
+Client facing artist directory lives at `/artists`, pulls photo/bio/gallery straight from what each artist's set on their own profile and gallery pages, nothing for Jay to keep in sync separately. Each artist card has a "message" button straight into a thread with them.
 
 ## security note
 
@@ -137,11 +149,25 @@ Client sign-in is now a one-time email code per device, not a typed-in phone num
 
 Card and QR endpoints now resolve the signed-in client from that session token server side, rather than trusting an id sent up from the browser. Closes the gap where anyone could've typed in a different account's id and seen someone else's stamp count.
 
+## shop setup
+
+Two new Stripe secrets needed, set both against the Pages project:
+
+```
+wrangler pages secret put STRIPE_SECRET_KEY --project-name=YOUR-PROJECT-NAME
+```
+
+```
+wrangler pages secret put STRIPE_WEBHOOK_SECRET --project-name=YOUR-PROJECT-NAME
+```
+
+The webhook secret comes from registering an endpoint in the Stripe dashboard (Developers → Webhooks → Add endpoint) pointing at `https://yourdomain/api/shop/webhook`, listening for `checkout.session.completed`. That endpoint is the real source of truth for a payment going through, not the success page redirect, someone can land on `/shop/success` without ever having actually paid, only the webhook marks an order `paid` in the database.
+
 ## next steps
 
-Loyalty loop, staff gallery, colour coded rota, verified client accounts, and enquiry threads are all built and wired together. That's every major feature group from the original brief.
+Loyalty loop, staff gallery, colour coded rota, verified client accounts, enquiry threads, the shop, owner/artist roles, and the client facing artist directory are all built and wired together. That's every major feature group from the original brief plus the first of the smaller additions.
 
-Remaining are the smaller additions from "the plan" (referral leaderboard, review nudge, waitlist, aftercare guide, stats dashboard, wallet pass, the shop) plus the two outstanding open items below. None of those need new architecture, they all hang off the client/staff records that already exist.
+Remaining: referral leaderboard, review nudges, waitlist, aftercare guide, and the stats dashboard. None of those need new architecture, they all hang off records that already exist.
 
 ---
 Intellectual property of Sidedoor Digital.

@@ -15,14 +15,20 @@ export default function Home() {
         <Link to="/card" style={{ color: "var(--watag-pink)", fontWeight: 600 }}>
           View your loyalty card →
         </Link>
+        <Link to="/artists" style={{ color: "var(--watag-amber)", fontWeight: 600 }}>
+          Meet the artists →
+        </Link>
         <Link to="/calendar" style={{ color: "var(--watag-amber)", fontWeight: 600 }}>
           See who's working →
         </Link>
         <Link to="/messages" style={{ color: "var(--watag-purple)", fontWeight: 600 }}>
           Message an artist →
         </Link>
+        <Link to="/shop" style={{ color: "var(--watag-cyan)", fontWeight: 600 }}>
+          Shop merch →
+        </Link>
         <Link to="/staff" style={{ color: "var(--watag-cyan)", fontWeight: 600 }}>
-          Staff login →
+          Artist login →
         </Link>
       </div>
     </div>

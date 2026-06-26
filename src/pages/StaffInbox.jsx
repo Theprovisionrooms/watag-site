@@ -28,7 +28,7 @@ export default function StaffInbox() {
 
   return (
     <div className="watag-screen">
-      <NavBack to="/staff/home" label="staff" />
+      <NavBack to="/staff/home" label="artist" />
       <h1>Enquiries</h1>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

@@ -1,14 +1,12 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 //
-// GET /api/staff/list
-// Active artists, public facing fields only, no role or PIN data
-// leaves this endpoint, that's only ever returned to the artist
-// themselves at login.
+// GET /api/shop/products
+// Active products only, for the public shop page.
 
 export async function onRequestGet({ env }) {
   const rows = await env.WATAG_DB.prepare(
-    `SELECT id, name, calendar_color, bio, photo_url FROM staff WHERE active = 1 ORDER BY name`
+    `SELECT id, name, description, price_cents, image_url FROM products WHERE active = 1 ORDER BY created_at DESC`
   ).all();
 
   return new Response(JSON.stringify(rows.results), {

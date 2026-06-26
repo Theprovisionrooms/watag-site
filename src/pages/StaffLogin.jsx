@@ -37,6 +37,7 @@ export default function StaffLogin() {
     localStorage.setItem("watag_staff_id", data.staffId);
     localStorage.setItem("watag_staff_name", data.name);
     localStorage.setItem("watag_staff_color", data.calendarColor);
+    localStorage.setItem("watag_staff_role", data.role);
     navigate("/staff/home");
   };
 
@@ -44,6 +45,7 @@ export default function StaffLogin() {
     return (
       <div className="watag-screen">
         <NavBack />
+        <span className="watag-eyebrow">Artist login</span>
         <h1>Who's on</h1>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {roster.map((s) => (

@@ -54,7 +54,7 @@ export default function StaffGallery() {
 
   return (
     <div className="watag-screen">
-      <NavBack to="/staff/home" label="staff" />
+      <NavBack to="/staff/home" label="artist" />
       <h1>My gallery</h1>
 
       <button
