@@ -61,7 +61,8 @@ function ProfileEntry({ onVerified }) {
     });
     setSubmitting(false);
     if (!res.ok) {
-      setError("couldn't send the code, try again");
+      const data = await res.json().catch(() => ({}));
+      setError(data.detail ? `couldn't send: ${data.detail}` : "couldn't send the code, try again");
       return;
     }
     setStep("code");
