@@ -4,12 +4,12 @@
 // POST /api/clients/request-code
 // Body: { email }
 // Sends a 6 digit code valid for 10 minutes. Needs RESEND_API_KEY set
-// as a secret, and a sending domain verified in Resend, currently set
-// to a placeholder, swap for WATAG's real domain.
-//
-// wrangler secret put RESEND_API_KEY
+// as a secret. Sends from Resend's own test domain for now, swap
+// RESEND_FROM below for a real verified domain once one's set up in
+// the Resend dashboard.
 
 const CODE_TTL_MINUTES = 10;
+const RESEND_FROM = "WATAG <onboarding@resend.dev>"; // swap once a real domain is verified in Resend
 
 export async function onRequestPost({ request, env }) {
   const { email } = await request.json();
@@ -31,19 +31,28 @@ export async function onRequestPost({ request, env }) {
     .bind(cleanEmail, code, expiresAt)
     .run();
 
-  await fetch("https://api.resend.com/emails", {
+  const resendRes = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      from: "WATAG <noreply@watag.co.uk>", // placeholder, swap for the real verified sending domain
+      from: RESEND_FROM,
       to: cleanEmail,
       subject: "Your WATAG code",
       text: `Your code is ${code}. It expires in ${CODE_TTL_MINUTES} minutes.`,
     }),
   });
+
+  if (!resendRes.ok) {
+    const detail = await resendRes.text();
+    console.error("resend send failed", resendRes.status, detail);
+    return new Response(
+      JSON.stringify({ error: "email_send_failed", detail }),
+      { status: 502, headers: { "content-type": "application/json" } }
+    );
+  }
 
   return new Response(JSON.stringify({ sent: true }), {
     headers: { "content-type": "application/json" },
