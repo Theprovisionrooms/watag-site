@@ -5,7 +5,7 @@
 // GET    /api/waitlist   ?staffId=1   entries for that artist, plus anyone happy with any artist
 // DELETE /api/waitlist   body: { id }   staff clears an entry once it's been actioned
 
-import { resolveClientSession } from "../_lib/session.js";
+import { resolveClientSession } from "../../_lib/session.js";
 
 export async function onRequestPost({ request, env }) {
   const clientId = await resolveClientSession(request, env);
