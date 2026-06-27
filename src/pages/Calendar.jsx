@@ -5,6 +5,7 @@
 // on a phone than a traditional week-view table.
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { NavBack } from "../App.jsx";
 
 function weekDates() {
@@ -78,7 +79,7 @@ export default function Calendar() {
                   <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
                     <span style={{ width: 8, height: 8, borderRadius: "50%", background: b.calendar_color, flexShrink: 0 }} />
                     <span style={{ fontSize: 14 }}>
-                      {member?.name || "staff"} · {b.start_time}–{b.end_time}
+                      {member?.name || "artist"} · {b.start_time}–{b.end_time}
                       {b.status === "booked" && <span style={{ color: "var(--watag-text-dim)" }}> · booked</span>}
                     </span>
                   </div>
@@ -90,6 +91,10 @@ export default function Calendar() {
           </div>
         );
       })}
+
+      <Link to="/waitlist" className="watag-card" style={{ textAlign: "center", color: "var(--watag-amber)", fontWeight: 600, textDecoration: "none" }}>
+        don't see a slot that works? join the waitlist →
+      </Link>
     </div>
   );
 }

@@ -39,6 +39,9 @@ export default function StaffHome() {
         <Link to="/staff/messages" className="watag-card" style={{ color: "var(--watag-purple)", fontWeight: 600, textDecoration: "none" }}>
           Enquiries →
         </Link>
+        <Link to="/staff/waitlist" className="watag-card" style={{ color: "var(--watag-amber)", fontWeight: 600, textDecoration: "none" }}>
+          Waitlist →
+        </Link>
         {role === "owner" && (
           <Link to="/staff/products" className="watag-card" style={{ color: "var(--watag-cyan)", fontWeight: 600, textDecoration: "none" }}>
             Manage shop →

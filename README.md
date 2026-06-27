@@ -165,9 +165,17 @@ The webhook secret comes from registering an endpoint in the Stripe dashboard (D
 
 ## next steps
 
-Loyalty loop, staff gallery, colour coded rota, verified client accounts, enquiry threads, the shop, owner/artist roles, and the client facing artist directory are all built and wired together. That's every major feature group from the original brief plus the first of the smaller additions.
+Loyalty loop, staff gallery, colour coded rota, verified client accounts, enquiry threads, the shop, owner/artist roles, the client facing artist directory, and the waitlist are all built and wired together.
 
-Remaining: referral leaderboard, review nudges, waitlist, aftercare guide, and the stats dashboard. None of those need new architecture, they all hang off records that already exist.
+Aftercare guide's been dropped from the plan, not worth building, skip it.
+
+Remaining, in build order:
+
+1. **Review nudges** — ties to SDD's AI discoverability goal, Google reviews are a real trust signal. Schema (`review_nudges`) already exists.
+2. **Stats dashboard** — owner-only, same gating pattern as the shop. More useful now there's real usage data to show.
+3. **Referral leaderboard** — the most moving parts (codes, signup tie-in, ranking, a reward hook), saved for last on purpose.
+
+None of these need new architecture, they all hang off records that already exist in the schema.
 
 ---
 Intellectual property of Sidedoor Digital.

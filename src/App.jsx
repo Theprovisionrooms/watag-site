@@ -5,6 +5,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import ClientLoyaltyCard from "./pages/ClientLoyaltyCard.jsx";
 import Calendar from "./pages/Calendar.jsx";
+import Waitlist from "./pages/Waitlist.jsx";
 import ClientMessages from "./pages/ClientMessages.jsx";
 import ClientThread from "./pages/ClientThread.jsx";
 import Artists from "./pages/Artists.jsx";
@@ -20,6 +21,7 @@ import StaffAvailability from "./pages/StaffAvailability.jsx";
 import StaffInbox from "./pages/StaffInbox.jsx";
 import StaffThread from "./pages/StaffThread.jsx";
 import StaffProducts from "./pages/StaffProducts.jsx";
+import StaffWaitlist from "./pages/StaffWaitlist.jsx";
 
 export default function App() {
   return (
@@ -27,6 +29,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/card" element={<ClientLoyaltyCard />} />
       <Route path="/calendar" element={<Calendar />} />
+      <Route path="/waitlist" element={<Waitlist />} />
       <Route path="/messages" element={<ClientMessages />} />
       <Route path="/messages/:threadId" element={<ClientThread />} />
       <Route path="/artists" element={<Artists />} />
@@ -42,6 +45,7 @@ export default function App() {
       <Route path="/staff/messages" element={<StaffInbox />} />
       <Route path="/staff/messages/:threadId" element={<StaffThread />} />
       <Route path="/staff/products" element={<StaffProducts />} />
+      <Route path="/staff/waitlist" element={<StaffWaitlist />} />
     </Routes>
   );
 }
