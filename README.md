@@ -133,6 +133,12 @@ Rabbit-in-sunglasses logo as the focal mark. Cyberpunk/vapor aesthetic: deep bla
 - **Migration 004 assumes staff id 1 is Jay** and marks that row as `owner`. Check it landed on the right person once it's live, if not just re-run `UPDATE staff SET role = 'owner' WHERE id = X` with the correct id, no harm done either way.
 - `GOOGLE_REVIEW_URL` in `functions/api/reviews/request.js` and `functions/api/reviews/click.js` is a placeholder, swap both for Jay's real Google Business Profile review link.
 
+## install banner
+
+A custom banner now floats at the bottom of the screen offering the install, since Chrome stopped showing its own install popup automatically a while back, this has to be triggered by hand from the `beforeinstallprompt` event. iOS has no such event at all, Safari never lets a site trigger its own install, so on iPhone the banner just shows plain instructions (share button, then "Add to Home Screen") instead of a button.
+
+Dismissing it hides it for 14 days, then it resurfaces. Once someone's actually installed it, it never shows again, detected via `display-mode: standalone`.
+
 ## icons
 
 Square 192px and 512px PWA icons now exist at `public/icons/icon-192.png` and `icon-512.png`, generated from the rabbit logo with enough padding to survive Android's circular masking. If Chrome wasn't offering an install prompt before, this was almost certainly why, a manifest pointing at icon files that don't exist fails the install check silently. Safari never shows an automatic prompt regardless, on any site, that's an Apple platform rule, "Add to Home Screen" via the Share menu is the only path there and always was.

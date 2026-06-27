@@ -22,31 +22,35 @@ import StaffInbox from "./pages/StaffInbox.jsx";
 import StaffThread from "./pages/StaffThread.jsx";
 import StaffProducts from "./pages/StaffProducts.jsx";
 import StaffWaitlist from "./pages/StaffWaitlist.jsx";
+import InstallPrompt from "./components/InstallPrompt.jsx";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/card" element={<ClientLoyaltyCard />} />
-      <Route path="/calendar" element={<Calendar />} />
-      <Route path="/waitlist" element={<Waitlist />} />
-      <Route path="/messages" element={<ClientMessages />} />
-      <Route path="/messages/:threadId" element={<ClientThread />} />
-      <Route path="/artists" element={<Artists />} />
-      <Route path="/artists/:staffId/gallery" element={<ArtistGallery />} />
-      <Route path="/shop" element={<Shop />} />
-      <Route path="/shop/success" element={<ShopSuccess />} />
-      <Route path="/staff" element={<StaffLogin />} />
-      <Route path="/staff/home" element={<StaffHome />} />
-      <Route path="/staff/profile" element={<StaffProfile />} />
-      <Route path="/staff/scan" element={<StaffScan />} />
-      <Route path="/staff/gallery" element={<StaffGallery />} />
-      <Route path="/staff/availability" element={<StaffAvailability />} />
-      <Route path="/staff/messages" element={<StaffInbox />} />
-      <Route path="/staff/messages/:threadId" element={<StaffThread />} />
-      <Route path="/staff/products" element={<StaffProducts />} />
-      <Route path="/staff/waitlist" element={<StaffWaitlist />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/card" element={<ClientLoyaltyCard />} />
+        <Route path="/calendar" element={<Calendar />} />
+        <Route path="/waitlist" element={<Waitlist />} />
+        <Route path="/messages" element={<ClientMessages />} />
+        <Route path="/messages/:threadId" element={<ClientThread />} />
+        <Route path="/artists" element={<Artists />} />
+        <Route path="/artists/:staffId/gallery" element={<ArtistGallery />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/shop/success" element={<ShopSuccess />} />
+        <Route path="/staff" element={<StaffLogin />} />
+        <Route path="/staff/home" element={<StaffHome />} />
+        <Route path="/staff/profile" element={<StaffProfile />} />
+        <Route path="/staff/scan" element={<StaffScan />} />
+        <Route path="/staff/gallery" element={<StaffGallery />} />
+        <Route path="/staff/availability" element={<StaffAvailability />} />
+        <Route path="/staff/messages" element={<StaffInbox />} />
+        <Route path="/staff/messages/:threadId" element={<StaffThread />} />
+        <Route path="/staff/products" element={<StaffProducts />} />
+        <Route path="/staff/waitlist" element={<StaffWaitlist />} />
+      </Routes>
+      <InstallPrompt />
+    </>
   );
 }
 
