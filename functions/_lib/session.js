@@ -50,3 +50,9 @@ export async function resolveViewer(request, env, { url, body } = {}) {
 
   return null;
 }
+
+export async function isOwner(env, staffId) {
+  if (!staffId) return false;
+  const staff = await env.WATAG_DB.prepare(`SELECT role FROM staff WHERE id = ?`).bind(staffId).first();
+  return staff?.role === "owner";
+}

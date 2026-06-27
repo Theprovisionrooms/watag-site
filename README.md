@@ -179,16 +179,15 @@ The webhook secret comes from registering an endpoint in the Stripe dashboard (D
 
 ## next steps
 
-Loyalty loop, staff gallery, colour coded rota, verified client accounts, enquiry threads, the shop, owner/artist roles, the client facing artist directory, the waitlist, and review nudges are all built and wired together.
+Loyalty loop, staff gallery, colour coded rota, verified client accounts, enquiry threads, the shop, owner/artist roles, the client facing artist directory, the waitlist, review nudges, and the owner-only stats dashboard are all built and wired together.
 
 Aftercare guide's been dropped from the plan, not worth building, skip it.
 
-Remaining, in build order:
+Remaining: the referral leaderboard. The most moving parts of what's left (codes, signup tie-in, ranking, a reward hook), which is exactly why it's been saved for last.
 
-1. **Stats dashboard** — owner-only, same gating pattern as the shop. More useful now there's real usage data to show.
-2. **Referral leaderboard** — the most moving parts (codes, signup tie-in, ranking, a reward hook), saved for last on purpose.
+## one honest gap in stats
 
-None of these need new architecture, they all hang off records that already exist in the schema.
+There's no "mark this reward as actually handed over" action anywhere in the app yet. The stats dashboard reports stamps issued and rewards currently sitting pending, not a historical redemption count, `loyalty_redemptions` exists in the schema but nothing writes to it. Worth building if Jay wants to see redemption history properly, just hasn't come up yet.
 
 ---
 Intellectual property of Sidedoor Digital.

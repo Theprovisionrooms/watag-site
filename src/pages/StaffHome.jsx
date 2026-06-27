@@ -43,9 +43,14 @@ export default function StaffHome() {
           Waitlist →
         </Link>
         {role === "owner" && (
-          <Link to="/staff/products" className="watag-card" style={{ color: "var(--watag-cyan)", fontWeight: 600, textDecoration: "none" }}>
-            Manage shop →
-          </Link>
+          <>
+            <Link to="/staff/products" className="watag-card" style={{ color: "var(--watag-cyan)", fontWeight: 600, textDecoration: "none" }}>
+              Manage shop →
+            </Link>
+            <Link to="/staff/stats" className="watag-card" style={{ color: "var(--watag-pink)", fontWeight: 600, textDecoration: "none" }}>
+              Stats →
+            </Link>
+          </>
         )}
       </div>
     </div>

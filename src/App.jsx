@@ -22,6 +22,7 @@ import StaffInbox from "./pages/StaffInbox.jsx";
 import StaffThread from "./pages/StaffThread.jsx";
 import StaffProducts from "./pages/StaffProducts.jsx";
 import StaffWaitlist from "./pages/StaffWaitlist.jsx";
+import StaffStats from "./pages/StaffStats.jsx";
 import InstallPrompt from "./components/InstallPrompt.jsx";
 
 export default function App() {
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/staff/messages/:threadId" element={<StaffThread />} />
         <Route path="/staff/products" element={<StaffProducts />} />
         <Route path="/staff/waitlist" element={<StaffWaitlist />} />
+        <Route path="/staff/stats" element={<StaffStats />} />
       </Routes>
       <InstallPrompt />
     </>

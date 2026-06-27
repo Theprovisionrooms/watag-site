@@ -10,14 +10,10 @@
 // side (a closed set of known people with their own PIN login), but
 // the role check itself is real, not just hidden by the frontend.
 
+import { isOwner } from "../../_lib/session.js";
+
 function safeFilename(name) {
   return name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-}
-
-async function isOwner(env, staffId) {
-  if (!staffId) return false;
-  const staff = await env.WATAG_DB.prepare(`SELECT role FROM staff WHERE id = ?`).bind(staffId).first();
-  return staff?.role === "owner";
 }
 
 export async function onRequestGet({ env }) {
