@@ -66,6 +66,8 @@ a {
 }
 
 .watag-screen {
+  position: relative;
+  z-index: 1;
   max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
@@ -98,10 +100,9 @@ a {
 .watag-synth-bg {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
   background: #0c0414;
-  will-change: transform;
 }
 
 .watag-synth-sky {
