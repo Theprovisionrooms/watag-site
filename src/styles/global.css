@@ -139,33 +139,6 @@ a {
   right: 0;
   bottom: 0;
   overflow: hidden;
-  perspective: 220px;
-  perspective-origin: 50% 0%;
-}
-
-.watag-synth-grid {
-  position: absolute;
-  left: -50%;
-  width: 200%;
-  top: 0;
-  height: 200%;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(0, 229, 255, 0.55) 0 2px, transparent 2px 64px),
-    repeating-linear-gradient(90deg, rgba(255, 45, 149, 0.4) 0 2px, transparent 2px 64px);
-  transform: rotateX(75deg);
-  transform-origin: top center;
-  animation: watag-grid-scroll 2.4s linear infinite;
-}
-
-@keyframes watag-grid-scroll {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 0 64px, 0 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .watag-synth-grid {
-    animation: none;
-  }
 }
 
 /* nav tile grid, the "feels like an app" home screen pattern */
