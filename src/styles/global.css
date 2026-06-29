@@ -101,8 +101,7 @@ a {
   z-index: -1;
   overflow: hidden;
   background: #0c0414;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  will-change: transform;
 }
 
 .watag-synth-sky {
@@ -139,6 +138,8 @@ a {
   right: 0;
   bottom: 0;
   overflow: hidden;
+  perspective: 220px;
+  perspective-origin: 50% 0%;
 }
 
 .watag-synth-grid {
@@ -150,7 +151,7 @@ a {
   background-image:
     repeating-linear-gradient(0deg, rgba(0, 229, 255, 0.55) 0 2px, transparent 2px 64px),
     repeating-linear-gradient(90deg, rgba(255, 45, 149, 0.4) 0 2px, transparent 2px 64px);
-  transform: perspective(220px) rotateX(75deg);
+  transform: rotateX(75deg);
   transform-origin: top center;
   animation: watag-grid-scroll 2.4s linear infinite;
 }
