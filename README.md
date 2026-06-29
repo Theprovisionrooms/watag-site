@@ -147,6 +147,14 @@ Square 192px and 512px PWA icons now exist at `public/icons/icon-192.png` and `i
 
 Artists send a review request straight from the scan screen, right after stamping a loyalty card, that's the moment someone's happiest with a fresh tattoo. The email link routes through `/api/reviews/click` first so a click gets recorded in `review_nudges` before redirecting on to the real Google review page.
 
+## navigation icons
+
+Home and the staff hub are now icon grids rather than lists of text links, this is the actual "feels like an app" bit Jay asked for at the very start. Each icon's custom (`src/components/icons.jsx`), built to match what it actually leads to, not generic clip art, and they all share one gradient stroke (defined once, globally, in `App.jsx`) so they read as a single family rather than mismatched pieces. The "meet the artists" icon is literally the rabbit's own sunglasses shape, since that's the one visual everyone already associates with WATAG.
+
+The rabbit gets a proper hero spot at the top of both home screens now too, with a slow ambient glow rather than constant motion, `prefers-reduced-motion` turns it off entirely.
+
+Only the two main hub screens have this treatment so far. The same icon language can extend to smaller in-page links (the artist directory's "view gallery" / "message" links, for instance) if that's wanted next, kept this round to where it matters most.
+
 ## artists, ownership, and roles
 
 "Staff" is now "Artists" everywhere a client or artist actually sees text. The code underneath still says `staff` throughout (tables, routes, function names), renaming all of that for a label change wasn't worth the risk, what matters is what shows on screen, not the folder structure.

@@ -86,3 +86,73 @@ a {
   border-radius: 16px;
   padding: 24px;
 }
+
+/* nav tile grid, the "feels like an app" home screen pattern */
+.watag-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.watag-nav-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--watag-bg-raised);
+  border: 1px solid var(--watag-border);
+  border-radius: 18px;
+  padding: 16px 6px;
+  text-decoration: none;
+  color: var(--watag-text);
+  transition: transform 120ms ease, border-color 150ms ease;
+}
+
+.watag-nav-tile:active {
+  transform: scale(0.94);
+}
+
+.watag-nav-tile:hover {
+  border-color: var(--watag-cyan);
+}
+
+.watag-nav-tile-icon {
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.45));
+  animation: watag-icon-pulse 4.5s ease-in-out infinite;
+}
+
+.watag-nav-tile-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+@keyframes watag-icon-pulse {
+  0%, 100% { opacity: 0.88; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+
+/* rabbit hero, ambient ember glow rather than constant motion */
+.watag-hero-rabbit {
+  width: 96px;
+  height: 96px;
+  display: block;
+  margin: 0 auto;
+  animation: watag-rabbit-glow 5s ease-in-out infinite;
+}
+
+@keyframes watag-rabbit-glow {
+  0%, 100% { filter: drop-shadow(0 0 14px rgba(233, 30, 140, 0.35)); }
+  50% { filter: drop-shadow(0 0 26px rgba(0, 229, 255, 0.45)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watag-nav-tile-icon,
+  .watag-hero-rabbit {
+    animation: none;
+  }
+}

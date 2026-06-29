@@ -30,6 +30,14 @@ import InstallPrompt from "./components/InstallPrompt.jsx";
 export default function App() {
   return (
     <>
+      <svg width="0" height="0" style={{ position: "absolute" }}>
+        <defs>
+          <linearGradient id="watagIconGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="var(--watag-pink)" />
+            <stop offset="100%" stopColor="var(--watag-cyan)" />
+          </linearGradient>
+        </defs>
+      </svg>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/card" element={<ClientLoyaltyCard />} />

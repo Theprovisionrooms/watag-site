@@ -1,8 +1,18 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import NavTile from "../components/NavTile.jsx";
+import {
+  ProfileIcon,
+  ScanIcon,
+  GalleryIcon,
+  ClockIcon,
+  ChatIcon,
+  ShopBagIcon,
+  ChartIcon,
+} from "../components/icons.jsx";
 
 export default function StaffHome() {
   const navigate = useNavigate();
@@ -21,35 +31,21 @@ export default function StaffHome() {
 
   return (
     <div className="watag-screen">
-      <span className="watag-eyebrow">Artist</span>
-      <h1>Hey {name}</h1>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <Link to="/staff/profile" className="watag-card" style={{ color: "var(--watag-pink)", fontWeight: 600, textDecoration: "none" }}>
-          My profile →
-        </Link>
-        <Link to="/staff/scan" className="watag-card" style={{ color: "var(--watag-pink)", fontWeight: 600, textDecoration: "none" }}>
-          Scan loyalty card →
-        </Link>
-        <Link to="/staff/gallery" className="watag-card" style={{ color: "var(--watag-cyan)", fontWeight: 600, textDecoration: "none" }}>
-          My gallery →
-        </Link>
-        <Link to="/staff/availability" className="watag-card" style={{ color: "var(--watag-amber)", fontWeight: 600, textDecoration: "none" }}>
-          My availability →
-        </Link>
-        <Link to="/staff/messages" className="watag-card" style={{ color: "var(--watag-purple)", fontWeight: 600, textDecoration: "none" }}>
-          Enquiries →
-        </Link>
-        <Link to="/staff/waitlist" className="watag-card" style={{ color: "var(--watag-amber)", fontWeight: 600, textDecoration: "none" }}>
-          Waitlist →
-        </Link>
+      <img src="/icons/icon-512.png" alt="" className="watag-hero-rabbit" style={{ width: 64, height: 64 }} />
+      <span className="watag-eyebrow" style={{ alignSelf: "center" }}>Artist</span>
+      <h1 style={{ textAlign: "center" }}>Hey {name}</h1>
+
+      <div className="watag-nav-grid">
+        <NavTile to="/staff/profile" icon={<ProfileIcon />} label="My profile" />
+        <NavTile to="/staff/scan" icon={<ScanIcon />} label="Scan loyalty card" />
+        <NavTile to="/staff/gallery" icon={<GalleryIcon />} label="My gallery" />
+        <NavTile to="/staff/availability" icon={<ClockIcon />} label="My availability" />
+        <NavTile to="/staff/messages" icon={<ChatIcon />} label="Enquiries" />
+        <NavTile to="/staff/waitlist" icon={<ClockIcon />} label="Waitlist" />
         {role === "owner" && (
           <>
-            <Link to="/staff/products" className="watag-card" style={{ color: "var(--watag-cyan)", fontWeight: 600, textDecoration: "none" }}>
-              Manage shop →
-            </Link>
-            <Link to="/staff/stats" className="watag-card" style={{ color: "var(--watag-pink)", fontWeight: 600, textDecoration: "none" }}>
-              Stats →
-            </Link>
+            <NavTile to="/staff/products" icon={<ShopBagIcon />} label="Manage shop" />
+            <NavTile to="/staff/stats" icon={<ChartIcon />} label="Stats" />
           </>
         )}
       </div>
