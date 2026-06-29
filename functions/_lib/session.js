@@ -56,3 +56,9 @@ export async function isOwner(env, staffId) {
   const staff = await env.WATAG_DB.prepare(`SELECT role FROM staff WHERE id = ?`).bind(staffId).first();
   return staff?.role === "owner";
 }
+
+export async function sha256Hex(value) {
+  const data = new TextEncoder().encode(value);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer), (b) => b.toString(16).padStart(2, "0")).join("");
+}

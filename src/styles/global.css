@@ -17,9 +17,8 @@ body,
 }
 
 body {
-  background-image:
-    radial-gradient(circle at 20% 0%, rgba(106, 47, 176, 0.25), transparent 45%),
-    radial-gradient(circle at 80% 100%, rgba(0, 229, 255, 0.12), transparent 40%);
+  /* visual background now comes from the fixed SynthwaveBackground component,
+     this stays as a plain dark fallback for the instant before it renders */
 }
 
 h1,
@@ -85,6 +84,78 @@ a {
   border: 1px solid var(--watag-border);
   border-radius: 16px;
   padding: 24px;
+}
+
+/* synthwave background, fixed behind everything, doesn't scroll with content */
+.watag-synth-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: #0c0414;
+}
+
+.watag-synth-sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58%;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 100%, rgba(255, 140, 70, 0.35), transparent 70%),
+    radial-gradient(ellipse 90% 70% at 50% 100%, rgba(120, 70, 200, 0.3), transparent 75%),
+    linear-gradient(to bottom, #0c0414 0%, #220b30 45%, #3a1230 75%, #4a1530 100%);
+}
+
+.watag-synth-stars {
+  position: absolute;
+  inset: 0;
+}
+
+.watag-synth-horizon {
+  position: absolute;
+  top: 58%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00e5ff 15%, #ff2d95 50%, #00e5ff 85%, transparent);
+  box-shadow: 0 0 24px 4px rgba(255, 45, 149, 0.55), 0 0 40px 10px rgba(0, 229, 255, 0.25);
+}
+
+.watag-synth-grid-wrap {
+  position: absolute;
+  top: 58%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  perspective: 220px;
+  perspective-origin: 50% 0%;
+}
+
+.watag-synth-grid {
+  position: absolute;
+  left: -50%;
+  width: 200%;
+  top: 0;
+  height: 200%;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0, 229, 255, 0.55) 0 2px, transparent 2px 64px),
+    repeating-linear-gradient(90deg, rgba(255, 45, 149, 0.4) 0 2px, transparent 2px 64px);
+  transform: rotateX(75deg);
+  transform-origin: top center;
+  animation: watag-grid-scroll 2.4s linear infinite;
+}
+
+@keyframes watag-grid-scroll {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 64px, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watag-synth-grid {
+    animation: none;
+  }
 }
 
 /* nav tile grid, the "feels like an app" home screen pattern */

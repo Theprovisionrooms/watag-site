@@ -18,6 +18,11 @@ export default function StaffProfile() {
   const [photoUrl, setPhotoUrl] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [currentPin, setCurrentPin] = useState("");
+  const [newPin, setNewPin] = useState("");
+  const [pinError, setPinError] = useState(null);
+  const [pinSaving, setPinSaving] = useState(false);
+  const [pinSaved, setPinSaved] = useState(false);
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
@@ -53,6 +58,26 @@ export default function StaffProfile() {
     localStorage.setItem("watag_staff_color", color);
     setSaving(false);
     setSaved(true);
+  }
+
+  async function changePin() {
+    setPinError(null);
+    setPinSaved(false);
+    setPinSaving(true);
+    const res = await fetch("/api/staff/change-pin", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ staffId, currentPin, newPin }),
+    });
+    const data = await res.json();
+    setPinSaving(false);
+    if (!res.ok) {
+      setPinError(data.error || "couldn't change it, try again");
+      return;
+    }
+    setCurrentPin("");
+    setNewPin("");
+    setPinSaved(true);
   }
 
   return (
@@ -97,6 +122,34 @@ export default function StaffProfile() {
           style={{ background: color, color: "#000", border: "none", borderRadius: 8, padding: 12, fontWeight: 700 }}
         >
           {saving ? "saving..." : saved ? "saved" : "save profile"}
+        </button>
+      </div>
+
+      <div className="watag-card" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <strong>Change your PIN</strong>
+        <input
+          type="password"
+          inputMode="numeric"
+          placeholder="current PIN"
+          value={currentPin}
+          onChange={(e) => setCurrentPin(e.target.value)}
+          style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 10, borderRadius: 8, letterSpacing: 2 }}
+        />
+        <input
+          type="password"
+          inputMode="numeric"
+          placeholder="new PIN, at least 4 digits"
+          value={newPin}
+          onChange={(e) => setNewPin(e.target.value)}
+          style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 10, borderRadius: 8, letterSpacing: 2 }}
+        />
+        {pinError && <span style={{ color: "var(--watag-pink)", fontSize: 13 }}>{pinError}</span>}
+        <button
+          onClick={changePin}
+          disabled={pinSaving || !currentPin || !newPin}
+          style={{ background: "none", border: "1px solid var(--watag-cyan)", color: "var(--watag-cyan)", borderRadius: 8, padding: 12, fontWeight: 700 }}
+        >
+          {pinSaving ? "updating..." : pinSaved ? "PIN updated" : "change PIN"}
         </button>
       </div>
     </div>

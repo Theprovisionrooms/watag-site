@@ -7,11 +7,7 @@
 // before comparison. Fine for a single studio with 3 known staff,
 // worth moving to proper session tokens if staff count grows.
 
-async function sha256Hex(value) {
-  const data = new TextEncoder().encode(value);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(hashBuffer), (b) => b.toString(16).padStart(2, "0")).join("");
-}
+import { sha256Hex } from "../../_lib/session.js";
 
 export async function onRequestPost({ request, env }) {
   const { staffId, pin } = await request.json();

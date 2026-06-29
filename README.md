@@ -147,6 +147,16 @@ Square 192px and 512px PWA icons now exist at `public/icons/icon-192.png` and `i
 
 Artists send a review request straight from the scan screen, right after stamping a loyalty card, that's the moment someone's happiest with a fresh tattoo. The email link routes through `/api/reviews/click` first so a click gets recorded in `review_nudges` before redirecting on to the real Google review page.
 
+## synthwave background
+
+Animated grid floor behind every screen, built to match the reference image directly: a gradient sky with scattered stars, a glowing pink-to-cyan horizon line, and a perspective grid that scrolls toward the viewer on a loop. Pure CSS, no video file, no heavy asset, a `background-position` animation under a `rotateX` perspective transform. Mounted once in `App.jsx`, fixed behind every route, doesn't scroll with the page content. Turns off entirely under `prefers-reduced-motion`, same pattern as everything else animated in this app.
+
+## staff PINs
+
+Artists can change their own PIN from `/staff/profile` now, requires the current one to set a new one, same as changing a password anywhere else. Blocks the obvious weak choices (`1234`, `0000`, sequences, that sort of thing), doesn't try to be a full password policy beyond that.
+
+**The seeded accounts are all still on `1234` right now**, that hasn't changed itself, changing it needs each artist to actually log in and use the new feature. Worth doing for all 3 accounts straight after this deploys, not leaving it for later.
+
 ## navigation icons
 
 Home and the staff hub are now icon grids rather than lists of text links, this is the actual "feels like an app" bit Jay asked for at the very start. Each icon's custom (`src/components/icons.jsx`), built to match what it actually leads to, not generic clip art, and they all share one gradient stroke (defined once, globally, in `App.jsx`) so they read as a single family rather than mismatched pieces. The "meet the artists" icon is literally the rabbit's own sunglasses shape, since that's the one visual everyone already associates with WATAG.

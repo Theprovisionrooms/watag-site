@@ -26,10 +26,12 @@ import StaffProducts from "./pages/StaffProducts.jsx";
 import StaffWaitlist from "./pages/StaffWaitlist.jsx";
 import StaffStats from "./pages/StaffStats.jsx";
 import InstallPrompt from "./components/InstallPrompt.jsx";
+import SynthwaveBackground from "./components/SynthwaveBackground.jsx";
 
 export default function App() {
   return (
     <>
+      <SynthwaveBackground />
       <svg width="0" height="0" style={{ position: "absolute" }}>
         <defs>
           <linearGradient id="watagIconGradient" x1="0" y1="0" x2="1" y2="1">
