@@ -96,11 +96,10 @@ export default function StaffScan() {
     } else {
       setStatus("success");
       setStampedClientId(data.clientId);
-      setMessage(
-        data.pendingReward
-          ? `stamp ${data.stampCount}/9, reward ready: ${data.pendingReward.replace("_", " ")}`
-          : `stamp ${data.stampCount}/9`
-      );
+      const base = data.pendingReward
+        ? `stamp ${data.stampCount}/9, reward ready: ${data.pendingReward.replace("_", " ")}`
+        : `stamp ${data.stampCount}/9`;
+      setMessage(data.referralCompleted ? `${base} · this was a referral, the referrer just got a bonus stamp` : base);
     }
   }
 

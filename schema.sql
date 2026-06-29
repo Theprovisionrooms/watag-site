@@ -55,8 +55,11 @@ CREATE TABLE clients (
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   phone TEXT NOT NULL,
+  referral_code TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );
+
+CREATE UNIQUE INDEX idx_clients_referral_code ON clients(referral_code) WHERE referral_code IS NOT NULL;
 
 CREATE TABLE client_verification_codes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -193,7 +196,8 @@ CREATE TABLE referrals (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   referrer_client_id INTEGER NOT NULL REFERENCES clients(id),
   referred_client_id INTEGER REFERENCES clients(id),
-  status TEXT DEFAULT 'pending',      -- pending | completed
+  status TEXT DEFAULT 'pending',      -- pending | completed, completed only once the referred person gets their first stamp
+  completed_at TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );
 

@@ -177,15 +177,19 @@ wrangler pages secret put STRIPE_WEBHOOK_SECRET --project-name=YOUR-PROJECT-NAME
 
 The webhook secret comes from registering an endpoint in the Stripe dashboard (Developers → Webhooks → Add endpoint) pointing at `https://yourdomain/api/shop/webhook`, listening for `checkout.session.completed`. That endpoint is the real source of truth for a payment going through, not the success page redirect, someone can land on `/shop/success` without ever having actually paid, only the webhook marks an order `paid` in the database.
 
+## referrals
+
+Each client gets a personal 6-character code and a shareable link (`/r/CODE`), generated the first time they visit `/referrals`. A signup through that link doesn't earn anything on its own, that's free and means nothing, the referral only completes once the new person actually comes in and gets their first stamp, at which point the referrer gets a bonus stamp on their own card automatically. The leaderboard at `/referrals` only counts completed referrals, same reasoning.
+
+The completion check lives inside `scan.js`, the same endpoint that already applies every stamp, it checks whether this is someone's genuine first ever stamp (not just a card that's reset to 0 after a 9-stamp reward), and if there's a pending referral sitting against them.
+
 ## next steps
 
-Loyalty loop, staff gallery, colour coded rota, verified client accounts, enquiry threads, the shop, owner/artist roles, the client facing artist directory, the waitlist, review nudges, and the owner-only stats dashboard are all built and wired together.
+Loyalty loop, staff gallery, colour coded rota, verified client accounts, enquiry threads, the shop, owner/artist roles, the client facing artist directory, the waitlist, review nudges, the owner-only stats dashboard, and referrals are all built and wired together. That's everything from the original brief plus every smaller addition agreed along the way, aftercare guide aside, which was deliberately dropped.
 
-Aftercare guide's been dropped from the plan, not worth building, skip it.
+Nothing left on the list. Next features come from whatever Jay actually asks for once people are using it for real.
 
-Remaining: the referral leaderboard. The most moving parts of what's left (codes, signup tie-in, ranking, a reward hook), which is exactly why it's been saved for last.
-
-## one honest gap in stats
+## one open gap, not new
 
 There's no "mark this reward as actually handed over" action anywhere in the app yet. The stats dashboard reports stamps issued and rewards currently sitting pending, not a historical redemption count, `loyalty_redemptions` exists in the schema but nothing writes to it. Worth building if Jay wants to see redemption history properly, just hasn't come up yet.
 

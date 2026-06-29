@@ -2,16 +2,18 @@
 // Intellectual property of Sidedoor Digital
 //
 // POST /api/clients/verify-code
-// Body: { email, code, name, phone }
+// Body: { email, code, name, phone, referralCode }
 // name and phone are only required the first time, for an existing
 // profile they're optional and just update the stored details if sent.
+// referralCode only matters for a brand new profile, ignored for an
+// existing one, can't be referred into an account that already exists.
 // Returns a session token, this is what the app stores from now on,
 // not a raw client id.
 
 import { createSession } from "../../_lib/session.js";
 
 export async function onRequestPost({ request, env }) {
-  const { email, code, name, phone } = await request.json();
+  const { email, code, name, phone, referralCode } = await request.json();
 
   if (!email || !code) {
     return new Response(JSON.stringify({ error: "email and code are required" }), {
@@ -56,6 +58,19 @@ export async function onRequestPost({ request, env }) {
       .bind(name.trim(), cleanEmail, phone.trim())
       .run();
     client = { id: result.meta.last_row_id, name: name.trim() };
+
+    if (referralCode) {
+      const referrer = await env.WATAG_DB.prepare(`SELECT id FROM clients WHERE referral_code = ?`)
+        .bind(referralCode.trim().toUpperCase())
+        .first();
+      if (referrer && referrer.id !== client.id) {
+        await env.WATAG_DB.prepare(
+          `INSERT INTO referrals (referrer_client_id, referred_client_id, status) VALUES (?, ?, 'pending')`
+        )
+          .bind(referrer.id, client.id)
+          .run();
+      }
+    }
   } else if (name || phone) {
     await env.WATAG_DB.prepare(`UPDATE clients SET name = COALESCE(?, name), phone = COALESCE(?, phone) WHERE id = ?`)
       .bind(name ? name.trim() : null, phone ? phone.trim() : null, client.id)

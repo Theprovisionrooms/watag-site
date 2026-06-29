@@ -10,6 +10,8 @@ import ClientMessages from "./pages/ClientMessages.jsx";
 import ClientThread from "./pages/ClientThread.jsx";
 import Artists from "./pages/Artists.jsx";
 import ArtistGallery from "./pages/ArtistGallery.jsx";
+import Referrals from "./pages/Referrals.jsx";
+import ReferralLanding from "./pages/ReferralLanding.jsx";
 import Shop from "./pages/Shop.jsx";
 import ShopSuccess from "./pages/ShopSuccess.jsx";
 import StaffLogin from "./pages/StaffLogin.jsx";
@@ -37,6 +39,8 @@ export default function App() {
         <Route path="/messages/:threadId" element={<ClientThread />} />
         <Route path="/artists" element={<Artists />} />
         <Route path="/artists/:staffId/gallery" element={<ArtistGallery />} />
+        <Route path="/referrals" element={<Referrals />} />
+        <Route path="/r/:code" element={<ReferralLanding />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/shop/success" element={<ShopSuccess />} />
         <Route path="/staff" element={<StaffLogin />} />

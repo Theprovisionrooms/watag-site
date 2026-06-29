@@ -71,13 +71,15 @@ function ProfileEntry({ onVerified }) {
   const verifyCode = async () => {
     setError(null);
     setSubmitting(true);
+    const referralCode = localStorage.getItem("watag_referral_code");
     const res = await fetch("/api/clients/verify-code", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email, code, name, phone }),
+      body: JSON.stringify({ email, code, name, phone, referralCode }),
     });
     const data = await res.json();
     setSubmitting(false);
+    localStorage.removeItem("watag_referral_code");
     if (!res.ok) {
       setError(data.error === "invalid_or_expired_code" ? "wrong code, check your email and try again" : data.error || "something went wrong");
       return;

@@ -27,6 +27,9 @@ export default function Home() {
         <Link to="/shop" style={{ color: "var(--watag-cyan)", fontWeight: 600 }}>
           Shop merch →
         </Link>
+        <Link to="/referrals" style={{ color: "var(--watag-pink)", fontWeight: 600 }}>
+          Refer a friend →
+        </Link>
         <Link to="/staff" style={{ color: "var(--watag-cyan)", fontWeight: 600 }}>
           Artist login →
         </Link>
