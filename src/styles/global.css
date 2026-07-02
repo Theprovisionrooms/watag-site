@@ -153,33 +153,36 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: var(--watag-bg-raised);
-  border: 1px solid var(--watag-border);
+  gap: 10px;
+  background: transparent;
+  border: none;
   border-radius: 18px;
-  padding: 16px 6px;
+  padding: 18px 4px;
+  min-height: 96px;
   text-decoration: none;
   color: var(--watag-text);
-  transition: transform 120ms ease, border-color 150ms ease;
+  transition: transform 120ms ease, background 150ms ease;
 }
 
 .watag-nav-tile:active {
-  transform: scale(0.94);
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .watag-nav-tile:hover {
-  border-color: var(--watag-cyan);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .watag-nav-tile-icon {
-  width: 34px;
-  height: 34px;
-  filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.45));
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.5));
   animation: watag-icon-pulse 4.5s ease-in-out infinite;
+  animation-delay: var(--watag-tile-delay, 0s);
 }
 
 .watag-nav-tile-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-align: center;
   line-height: 1.2;
@@ -187,7 +190,12 @@ a {
 
 @keyframes watag-icon-pulse {
   0%, 100% { opacity: 0.88; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.06); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* tap-triggered glitch on a nav icon, fires once on press, reuses the same RGB split as the stamp glitch */
+.watag-icon-glitch {
+  animation: watag-glitch 320ms ease-in-out 1 !important;
 }
 
 /* rabbit hero, ambient ember glow rather than constant motion */
@@ -206,6 +214,7 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .watag-nav-tile-icon,
+  .watag-icon-glitch,
   .watag-hero-rabbit {
     animation: none;
   }

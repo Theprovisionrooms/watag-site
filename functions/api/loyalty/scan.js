@@ -15,6 +15,11 @@
 // referral link, that referral completes here and the person who
 // referred them gets a bonus stamp on their own card. A signup alone
 // never earns that, only a real first visit does.
+//
+// Push notifications fire here too, for the client whose card was
+// just stamped and, if a referral completed, for the referrer.
+
+import { notifyOwner } from "../../_lib/webpush.js";
 
 const STAMP_COOLDOWN_SECONDS = 120;
 
@@ -93,6 +98,11 @@ export async function onRequestPost({ request, env }) {
 
   const { newCount, reward } = await applyStamp(db, clientId, staffId);
 
+  const stampMessage = reward
+    ? { title: "Reward unlocked!", body: `Stamp ${newCount}/9, your ${reward.replace("_", " ")} is ready to redeem.` }
+    : { title: "Stamp added", body: `You're on ${newCount}/9 stamps.` };
+  await notifyOwner(env, "client", clientId, { ...stampMessage, url: "/card" });
+
   let referralCompleted = false;
 
   if (isFirstEverStamp) {
@@ -108,6 +118,11 @@ export async function onRequestPost({ request, env }) {
         .run();
 
       await applyStamp(db, pendingReferral.referrer_client_id, staffId);
+      await notifyOwner(env, "client", pendingReferral.referrer_client_id, {
+        title: "Referral bonus!",
+        body: "Someone you referred just came in, you've earned a bonus stamp.",
+        url: "/card",
+      });
       referralCompleted = true;
     }
   }

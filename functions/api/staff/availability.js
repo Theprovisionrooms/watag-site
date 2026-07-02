@@ -8,6 +8,11 @@
 // POST /api/staff/availability
 //      Body: { staffId, date, startTime, endTime, status }
 //      A staff member sets or updates their own availability block.
+//      If the slot's status is "available" and someone's on the
+//      waitlist for that date (with this artist specifically, or
+//      happy with any artist), they get pinged.
+
+import { notifyOwner } from "../../_lib/webpush.js";
 
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
@@ -53,6 +58,24 @@ export async function onRequestPost({ request, env }) {
   )
     .bind(staffId, date, startTime, endTime, status || "available", notes || null)
     .run();
+
+  if ((status || "available") === "available") {
+    const matches = await env.WATAG_DB.prepare(
+      `SELECT client_id FROM waitlist WHERE requested_date = ? AND (staff_id = ? OR staff_id IS NULL)`
+    )
+      .bind(date, staffId)
+      .all();
+
+    await Promise.all(
+      matches.results.map((m) =>
+        notifyOwner(env, "client", m.client_id, {
+          title: "A slot just opened up",
+          body: `There's availability on ${date}, the day you were waiting for.`,
+          url: "/calendar",
+        })
+      )
+    );
+  }
 
   return new Response(JSON.stringify({ id: result.meta.last_row_id }), {
     headers: { "content-type": "application/json" },

@@ -1,5 +1,12 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
+//
+// strategies: "injectManifest" rather than the default "generateSW".
+// generateSW auto-builds a service worker from config and doesn't
+// support adding custom event listeners, injectManifest takes our own
+// service worker source (src/sw.js) and injects the precache manifest
+// into it, so push and notificationclick handlers can live alongside
+// the offline caching Vite/Workbox still sets up automatically.
 
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -9,6 +16,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.js",
       registerType: "autoUpdate",
       includeAssets: ["icons/rabbit-source.png"],
       manifest: {
@@ -26,14 +36,8 @@ export default defineConfig({
           { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" },
         ],
       },
-      workbox: {
-        navigateFallbackDenylist: [/^\/api\//],
-        runtimeCaching: [
-          {
-            urlPattern: /^\/api\//,
-            handler: "NetworkOnly",
-          },
-        ],
+      injectManifest: {
+        injectionPoint: "self.__WB_MANIFEST",
       },
     }),
   ],

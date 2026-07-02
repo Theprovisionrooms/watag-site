@@ -9,6 +9,7 @@
 // in a live connection later is a delivery layer change, not a rewrite.
 
 import { resolveViewer } from "../../_lib/session.js";
+import { notifyOwner } from "../../_lib/webpush.js";
 
 async function authoriseThread(env, threadId, viewer) {
   const thread = await env.WATAG_DB.prepare(`SELECT client_id, staff_id FROM enquiry_threads WHERE id = ?`)
@@ -80,6 +81,17 @@ export async function onRequestPost({ request, env }) {
   await env.WATAG_DB.prepare(`UPDATE enquiry_threads SET last_message_at = datetime('now') WHERE id = ?`)
     .bind(threadId)
     .run();
+
+  const recipientType = viewer.type === "client" ? "staff" : "client";
+  const recipientId = viewer.type === "client" ? thread.staff_id : thread.client_id;
+  const senderTable = viewer.type === "client" ? "clients" : "staff";
+  const sender = await env.WATAG_DB.prepare(`SELECT name FROM ${senderTable} WHERE id = ?`).bind(viewer.id).first();
+
+  await notifyOwner(env, recipientType, recipientId, {
+    title: sender?.name || "New message",
+    body: messageBody.trim().slice(0, 100),
+    url: recipientType === "client" ? `/messages/${threadId}` : `/staff/messages/${threadId}`,
+  });
 
   return new Response(JSON.stringify({ id: result.meta.last_row_id }), { headers: { "content-type": "application/json" } });
 }

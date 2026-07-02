@@ -9,7 +9,9 @@ compatibility_date = "2026-06-23"
 binding = "WATAG_DB"
 database_name = "watag-db"
 database_id = "a055f1cf-2ea9-4327-9ed9-881522a3c38d"
-
 [[r2_buckets]]
 binding = "WATAG_MEDIA"
 bucket_name = "watag-media"
+
+[vars]
+VITE_VAPID_PUBLIC_KEY =BKYDl7B0z2Kck25zKSeufpCH4fWGH6134eAJsZRAKyv4wAZNZhwIq46R1CufNN4Qdh6WHEpW--KjUtUN_3HJ9qM 

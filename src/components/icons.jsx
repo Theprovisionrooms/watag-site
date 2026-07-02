@@ -143,3 +143,12 @@ export function ChartIcon() {
     </svg>
   );
 }
+
+export function BellIcon() {
+  return (
+    <svg {...base}>
+      <path d="M24 6c-6 0-10 5-10 12v6l-4 8h28l-4-8v-6c0-7-4-12-10-12z" />
+      <path d="M19 35a5 5 0 0 0 10 0" />
+    </svg>
+  );
+}

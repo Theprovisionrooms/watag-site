@@ -11,48 +11,46 @@ GitHub is the source of truth. Cloudflare Pages deploys from this repo only. No 
 
 ## what this is
 
-Not a website with an app bolted on. The loyalty system is the headline feature and everything else (staff hub, calendar, shop, enquiries) hangs off the same client account so Jay can bring all his clients into one place over time.
+Not a website with an app bolted on. The loyalty system is the headline feature, everything else hangs off the same client or artist account so Jay can run the whole studio through one place over time.
 
-Built as an installable PWA rather than a native app for v1. Gets a home screen icon, opens full screen, works offline for cached pages, can push notifications. No app store account or review process needed. Native wrapper (Capacitor/TWA) is a viable phase 2 if the app store presence becomes worth it once there's a real user base.
+Installable PWA rather than a native app. Home screen icon, opens full screen, works offline for cached pages, can push notifications. No app store account or review process needed. Native wrapper (Capacitor/TWA) stays a viable phase 2 if that's ever worth it.
 
-## locked decisions
+## status: everything's built
 
-**loyalty card**
-- Stamp tiers: 3 stamps = small tattoo, 6 stamps = item of merch (client picks from a loyalty-eligible list, not one fixed item), 9 stamps = 3 hour session credit applied at next booking.
-- Card resets to 0 after the 9 stamp reward is redeemed.
-- Stamping is QR based. Client's account screen shows a QR code. Staff scan it through an in-app camera view (browser camera access, no native API needed).
-- QR encodes a short lived rotating token (60 second expiry, single use) rather than a static client ID, so a screenshot can't be reused to fake a stamp.
-- Server side cooldown after each successful stamp to stop accidental double scans.
+Every feature from the original brief is live, plus everything agreed along the way. Nothing queued up right now, next work comes from real usage once Jay and his artists are actually on it.
 
-**staff hub**
-- 3 staff members.
-- Each staff member logs in and can: set their own calendar colour (RGB picker), set their own availability, scan loyalty QR codes, upload to their own gallery, manage their own enquiry thread.
-- Studio → staff → (gallery, availability, enquiries) structure, so adding a 4th artist later is a new row, not new code.
+| Area | Where | What it does |
+|---|---|---|
+| Loyalty card | `/card` | QR stamping, 3/6/9 tier rewards, rotating codes so a screenshot can't be reused |
+| Client accounts | `/card` (first visit) | Name, phone, email verified by a one-time code, then silent on that device after |
+| Artist accounts | `/staff` | PIN login, two roles: `owner` (Jay) and `artist` |
+| Artist profiles | `/staff/profile` | Each artist edits their own name, bio, photo, calendar colour, and PIN |
+| Artist directory | `/artists` | Client facing, photo, bio, gallery link, message button per artist |
+| Calendar | `/calendar`, `/staff/availability` | Colour coded per artist, artists set their own slots |
+| Gallery | `/staff/gallery`, `/artists/:id/gallery` | Each artist uploads their own portfolio, public read-only view per artist |
+| Enquiries | `/messages`, `/staff/messages` | Polling based chat threads, client ↔ artist, feels instant |
+| Shop | `/shop`, `/staff/products` | Stripe checkout, owner-only product management, pickup in studio |
+| Waitlist | `/waitlist`, `/staff/waitlist` | Client requests a date that's not free, artists see who's waiting |
+| Review nudges | scan screen → email | Sent right after a stamp, click-tracked link through to the Google review |
+| Referrals | `/referrals` | Personal code + link, completes on the referred person's first stamp, bonus stamp for the referrer, leaderboard |
+| Stats dashboard | `/staff/stats` | Owner only, revenue, top sellers, client growth, loyalty volume, enquiry volume, review click rate |
+| Push notifications | bell tile, both home screens | Stamp/reward, referral bonus, new enquiry message, waitlist match, hand-rolled Web Push (no Node dependency) |
+| Visual system | site-wide | Animated canvas synthwave background, icon nav grid (enlarged, no card boxes), tap glitch, rabbit hero, brand gradient |
+| Install | site-wide | Custom install banner (Android) / instructions (iOS), PWA icons, manifest |
 
-**calendar / availability**
-- Per staff colour coding, chosen by the staff member themselves on login/settings, not fixed by admin.
-- Simple availability block table per staff member. No external calendar tool integration, built in house.
-
-**enquiries / booking**
-- Structured per-thread enquiry system, one thread per client/artist pair. Feels like a chat to the client (message lands within a couple of seconds, no full reload) but is delivered by polling rather than a true open socket for v1.
-- Data model (threads + messages + read state) is identical to real chat, so upgrading to a live socket (Cloudflare Durable Objects) later is a delivery-layer swap, not a rewrite.
-- Text only in v1. Clients can attach a reference photo by picking from the artist's existing gallery rather than uploading their own image into the thread.
-
-**shop**
-- Small to start. Same Stripe checkout pattern as Candymonium. Product/variant schema built so sizes and options later are new rows, not new tables.
-
-**everything else on the brief** (referral leaderboard, review nudge, waitlist, aftercare guide, stats dashboard) sits on top of the client/staff records once they exist. No special architecture needed, flagged as v1.5 additions once the core loop is live.
+Dropped from the plan on purpose: an aftercare guide page, decided not worth building.
 
 ## tech stack
 
-Collapsed to one provider rather than running Vercel + Supabase + Cloudflare side by side, matching the pattern already proven on Candymonium and the SDD rebuild.
+One provider rather than several side by side, same pattern proven on Candymonium and the SDD rebuild.
 
 - **Frontend:** React (Vite)
 - **Hosting:** Cloudflare Pages
 - **Backend:** Cloudflare Pages Functions
 - **Database:** D1
+- **Media storage:** R2
 - **Payments:** Stripe
-- **Email / magic link auth:** Resend
+- **Email:** Resend
 - **Domain / security:** Cloudflare
 
 ## repo structure
@@ -60,38 +58,42 @@ Collapsed to one provider rather than running Vercel + Supabase + Cloudflare sid
 ```
 watag/
 ├── index.html
-├── vite.config.js           PWA manifest generated from here
-├── public/
-│   └── icons/                app icons (rabbit logo, needs square exports)
+├── vite.config.js                  PWA manifest generated from here
+├── public/icons/                   app icons
 ├── src/
 │   ├── main.jsx
-│   ├── App.jsx
-│   ├── pages/
-│   │   ├── Home.jsx
-│   │   ├── ClientLoyaltyCard.jsx   the loyalty passport, QR + stamp progress
-│   │   ├── StaffLogin.jsx
-│   │   └── StaffScan.jsx           camera scanner, stamps the card
+│   ├── App.jsx                      router, global icon gradient, synthwave mount
+│   ├── components/
+│   │   ├── icons.jsx                 the full nav icon set
+│   │   ├── NavTile.jsx               icon grid tile
+│   │   ├── SynthwaveBackground.jsx   animated background
+│   │   ├── InstallPrompt.jsx         custom install banner
+│   │   └── MessageThread.jsx         shared chat UI, client + staff
+│   ├── pages/                        one file per screen, 20+ now, see App.jsx for the full route list
 │   └── styles/
-│       ├── tokens.css        brand colour variables
-│       └── global.css        resets, glitch effect, shared layout classes
+│       ├── tokens.css                 brand colour variables
+│       └── global.css                 resets, animations, nav grid, synthwave CSS
 ├── functions/
+│   ├── _lib/session.js               shared auth helpers (session, viewer, owner check, pin hashing)
+│   ├── media/[[path]].js             serves R2 files through our own domain
 │   └── api/
-│       ├── loyalty/
-│       │   ├── qr-generate.js     rotating token for the client's QR
-│       │   ├── scan.js            staff side, applies the stamp
-│       │   └── card.js            client side, current stamp count
-│       └── staff/
-│           ├── availability.js
-│           ├── settings.js        staff pick their own calendar colour
-│           └── login.js           PIN login
-├── schema.sql               D1 schema, full data model
-├── seed.sql                  3 placeholder staff accounts, default pin 1234
+│       ├── clients/                  request-code, verify-code (signup + login)
+│       ├── loyalty/                  card, qr-generate, scan (stamps, rewards, referral completion)
+│       ├── staff/                    login, change-pin, profile, list, availability, gallery, products, stats
+│       ├── enquiries/                 start, threads, messages
+│       ├── shop/                      products, checkout, webhook
+│       ├── referrals/                 code, leaderboard
+│       ├── reviews/                   request, click
+│       └── waitlist/
+├── migrations/                       run in order against an existing database, see setup below
+├── schema.sql                        full schema, matches a brand new database exactly
+├── seed.sql                          3 placeholder artist accounts
 ├── wrangler.toml
 ├── package.json
 └── LICENSE
 ```
 
-## setup
+## setup, brand new database
 
 ```
 npm install
@@ -104,112 +106,88 @@ wrangler d1 create watag-db
 Copy the returned `database_id` into `wrangler.toml`.
 
 ```
-wrangler d1 execute watag-db --file=./schema.sql
+wrangler d1 execute watag-db --file=./schema.sql --remote
 ```
 
 ```
-wrangler d1 execute watag-db --file=./seed.sql
+wrangler d1 execute watag-db --file=./seed.sql --remote
 ```
 
 ```
-npm run dev
+wrangler r2 bucket create watag-media
 ```
 
-```
-wrangler pages dev
-```
-
-## brand
-
-Rabbit-in-sunglasses logo as the focal mark. Cyberpunk/vapor aesthetic: deep black/navy background, hot pink and cyan as primary accents, amber for tags/labels, glitch effects on hover and on stamp/reward moments rather than constant looping (needs a `prefers-reduced-motion` fallback). Boot/glitch loader on first load using the rabbit, doubling as the PWA splash screen. No em dashes, no emojis, no generic agency language anywhere in copy.
-
-## open items
-
-- Live sign-off from Jay on the merch list that's loyalty-eligible at the 6 stamp tier, the checkbox exists in the staff product form now, just needs him deciding which items it applies to.
-- `RESEND_API_KEY` needs setting as a secret before the email code or order confirmation emails can actually send, set against the Pages project: `wrangler pages secret put RESEND_API_KEY --project-name=YOUR-PROJECT-NAME`.
-- `request-code.js` and `webhook.js` both currently send from Resend's test domain, swap for a real verified domain once one's set up in the Resend dashboard.
-- Enquiry threads are text only for v1. The schema's got a `gallery_ref_id` column ready for letting a client attach one of the artist's existing gallery photos as a reference, just needs the picker UI on top when there's time, low priority for now.
-- Shop assumes pickup in studio, not delivery. Easy to add shipping later, the schema doesn't change either way, just flagging it was an assumption, not a confirmed decision from Jay.
-- **Migration 004 assumes staff id 1 is Jay** and marks that row as `owner`. Check it landed on the right person once it's live, if not just re-run `UPDATE staff SET role = 'owner' WHERE id = X` with the correct id, no harm done either way.
-- `GOOGLE_REVIEW_URL` in `functions/api/reviews/request.js` and `functions/api/reviews/click.js` is a placeholder, swap both for Jay's real Google Business Profile review link.
-
-## install banner
-
-A custom banner now floats at the bottom of the screen offering the install, since Chrome stopped showing its own install popup automatically a while back, this has to be triggered by hand from the `beforeinstallprompt` event. iOS has no such event at all, Safari never lets a site trigger its own install, so on iPhone the banner just shows plain instructions (share button, then "Add to Home Screen") instead of a button.
-
-Dismissing it hides it for 14 days, then it resurfaces. Once someone's actually installed it, it never shows again, detected via `display-mode: standalone`.
-
-## icons
-
-Square 192px and 512px PWA icons now exist at `public/icons/icon-192.png` and `icon-512.png`, generated from the rabbit logo with enough padding to survive Android's circular masking. If Chrome wasn't offering an install prompt before, this was almost certainly why, a manifest pointing at icon files that don't exist fails the install check silently. Safari never shows an automatic prompt regardless, on any site, that's an Apple platform rule, "Add to Home Screen" via the Share menu is the only path there and always was.
-
-## review nudges
-
-Artists send a review request straight from the scan screen, right after stamping a loyalty card, that's the moment someone's happiest with a fresh tattoo. The email link routes through `/api/reviews/click` first so a click gets recorded in `review_nudges` before redirecting on to the real Google review page.
-
-## synthwave background
-
-Animated grid floor behind every screen, built to match the reference image directly: a gradient sky with scattered stars, a glowing pink-to-cyan horizon line, and a perspective grid that scrolls toward the viewer on a loop. Pure CSS, no video file, no heavy asset, a `background-position` animation under a `rotateX` perspective transform. Mounted once in `App.jsx`, fixed behind every route, doesn't scroll with the page content. Turns off entirely under `prefers-reduced-motion`, same pattern as everything else animated in this app.
-
-## staff PINs
-
-Artists can change their own PIN from `/staff/profile` now, requires the current one to set a new one, same as changing a password anywhere else. Blocks the obvious weak choices (`1234`, `0000`, sequences, that sort of thing), doesn't try to be a full password policy beyond that.
-
-**The seeded accounts are all still on `1234` right now**, that hasn't changed itself, changing it needs each artist to actually log in and use the new feature. Worth doing for all 3 accounts straight after this deploys, not leaving it for later.
-
-## navigation icons
-
-Home and the staff hub are now icon grids rather than lists of text links, this is the actual "feels like an app" bit Jay asked for at the very start. Each icon's custom (`src/components/icons.jsx`), built to match what it actually leads to, not generic clip art, and they all share one gradient stroke (defined once, globally, in `App.jsx`) so they read as a single family rather than mismatched pieces. The "meet the artists" icon is literally the rabbit's own sunglasses shape, since that's the one visual everyone already associates with WATAG.
-
-The rabbit gets a proper hero spot at the top of both home screens now too, with a slow ambient glow rather than constant motion, `prefers-reduced-motion` turns it off entirely.
-
-Only the two main hub screens have this treatment so far. The same icon language can extend to smaller in-page links (the artist directory's "view gallery" / "message" links, for instance) if that's wanted next, kept this round to where it matters most.
-
-## artists, ownership, and roles
-
-"Staff" is now "Artists" everywhere a client or artist actually sees text. The code underneath still says `staff` throughout (tables, routes, function names), renaming all of that for a label change wasn't worth the risk, what matters is what shows on screen, not the folder structure.
-
-Each artist edits their own name, bio, and photo at `/staff/profile`, that's the one place all of it lives now, the colour picker moved there too from the old availability page.
-
-Two roles exist on the `staff` table: `owner` and `artist`. Jay's the only `owner`. That role gates the shop management page and its underlying endpoints, both in the UI (an artist won't even see the "Manage shop" link) and on the server (the endpoint checks the role itself, doesn't just trust the frontend to hide the button). Worth knowing honestly: the product endpoints had **no permission check at all** before this, anyone with the right URL could've added or removed stock. That's closed now, not a new gap, an existing one finally locked down.
-
-Client facing artist directory lives at `/artists`, pulls photo/bio/gallery straight from what each artist's set on their own profile and gallery pages, nothing for Jay to keep in sync separately. Each artist card has a "message" button straight into a thread with them.
-
-## security note
-
-Client sign-in is now a one-time email code per device, not a typed-in phone number. First visit on a phone needs the code, every visit after that is instant, the session token just sits on the device and gets reused silently. Phone number's still collected and shown on the profile, it's just not the thing that proves who someone is anymore, email is.
-
-Card and QR endpoints now resolve the signed-in client from that session token server side, rather than trusting an id sent up from the browser. Closes the gap where anyone could've typed in a different account's id and seen someone else's stamp count.
-
-## shop setup
-
-Two new Stripe secrets needed, set both against the Pages project:
+Secrets, set against the Pages project, not as Workers secrets:
 
 ```
+wrangler pages secret put RESEND_API_KEY --project-name=YOUR-PROJECT-NAME
 wrangler pages secret put STRIPE_SECRET_KEY --project-name=YOUR-PROJECT-NAME
-```
-
-```
 wrangler pages secret put STRIPE_WEBHOOK_SECRET --project-name=YOUR-PROJECT-NAME
 ```
 
-The webhook secret comes from registering an endpoint in the Stripe dashboard (Developers → Webhooks → Add endpoint) pointing at `https://yourdomain/api/shop/webhook`, listening for `checkout.session.completed`. That endpoint is the real source of truth for a payment going through, not the success page redirect, someone can land on `/shop/success` without ever having actually paid, only the webhook marks an order `paid` in the database.
+Stripe webhook secret comes from Stripe dashboard → Developers → Webhooks → Add endpoint, pointing at `https://yourdomain/api/shop/webhook`, listening for `checkout.session.completed`.
 
-## referrals
+## setup, existing database (this one)
 
-Each client gets a personal 6-character code and a shareable link (`/r/CODE`), generated the first time they visit `/referrals`. A signup through that link doesn't earn anything on its own, that's free and means nothing, the referral only completes once the new person actually comes in and gets their first stamp, at which point the referrer gets a bonus stamp on their own card automatically. The leaderboard at `/referrals` only counts completed referrals, same reasoning.
+Migrations already run, in order, against the live database: `002`, `003`, `004`, `005`, `006`, all in `migrations/`. If recreating from scratch, `schema.sql` already matches the end state, the migrations folder is history, not something to re-run.
 
-The completion check lives inside `scan.js`, the same endpoint that already applies every stamp, it checks whether this is someone's genuine first ever stamp (not just a card that's reset to 0 after a 9-stamp reward), and if there's a pending referral sitting against them.
+## push notifications
 
-## next steps
+Real push, not just the install banner. Four triggers fire automatically:
 
-Loyalty loop, staff gallery, colour coded rota, verified client accounts, enquiry threads, the shop, owner/artist roles, the client facing artist directory, the waitlist, review nudges, the owner-only stats dashboard, and referrals are all built and wired together. That's everything from the original brief plus every smaller addition agreed along the way, aftercare guide aside, which was deliberately dropped.
+- **a stamp lands** → the client's notified, a different message if it unlocked a reward
+- **a referral completes** → the referrer's notified about their bonus stamp
+- **a new enquiry message arrives** → whoever didn't send it is notified
+- **an artist adds an available slot** → anyone on the waitlist for that date (with them specifically, or happy with anyone) gets notified automatically, no one has to remember to check the waitlist by hand
 
-Nothing left on the list. Next features come from whatever Jay actually asks for once people are using it for real.
+Either side turns it on from a bell tile on their home screen, browser permission prompt, done.
 
-## one open gap, not new
+**Why this was hand-built:** the standard `web-push` npm package depends on Node's `crypto` module, which doesn't exist in the Cloudflare Pages Functions runtime. `functions/_lib/webpush.js` implements the same protocol (RFC 8291 payload encryption, RFC 8292 VAPID auth) directly against the Workers runtime's native `crypto.subtle`, same end result, no dependency.
 
-There's no "mark this reward as actually handed over" action anywhere in the app yet. The stats dashboard reports stamps issued and rewards currently sitting pending, not a historical redemption count, `loyalty_redemptions` exists in the schema but nothing writes to it. Worth building if Jay wants to see redemption history properly, just hasn't come up yet.
+**One-time setup:**
+
+```
+node scripts/generate-vapid-keys.js
+```
+
+```
+wrangler pages secret put VAPID_PRIVATE_KEY --project-name=YOUR-PROJECT-NAME
+```
+
+The public key isn't a secret, it has to ship to the browser by design. Set it as a **build environment variable** in the Cloudflare Pages dashboard (Settings → Environment variables, not `wrangler pages secret`): `VITE_VAPID_PUBLIC_KEY`.
+
+```
+wrangler d1 execute watag-db --file=./migrations/006_push_subscriptions.sql --remote
+```
+
+**Service worker note:** the PWA strategy changed from `generateSW` to `injectManifest` (`vite.config.js`) to support custom `push`/`notificationclick` handlers, the default mode can't add those. Service worker source now lives at `src/sw.js`, not auto-generated. New build dependencies: `workbox-precaching`, `workbox-routing`, `workbox-strategies`, run `npm install` after pulling this.
+
+## key design decisions worth knowing
+
+- **QR tokens rotate every 60 seconds**, single use, so a screenshot of someone's loyalty card can't be reused to fake a stamp.
+- **Client sign-in is a one-time email code, once per device.** First visit needs it, every visit after is instant. Phone number's collected and shown on the profile but isn't the security key, email is.
+- **Session tokens, not raw client ids.** Card and QR endpoints resolve the signed-in client from a signed session token server side, never trust an id sent up from the browser.
+- **Owner role gates money.** Shop management and the stats dashboard check `role = 'owner'` both in the UI and on the server. The shop endpoints had no permission check at all before this was added, worth knowing that was a real gap, now closed.
+- **Referrals only complete on a genuine first visit**, not a signup. Signing up is free and proves nothing, getting a first stamp does. Bonus stamp for the referrer fires from inside `scan.js`, the same place every stamp gets applied.
+- **Enquiries poll every few seconds rather than holding a socket open.** Feels instant on a phone, costs far less to run. The data model (threads, messages, read state) is identical to real chat, so swapping in a live connection later is a delivery layer change, not a rewrite.
+- **"Staff" is "Artists" everywhere visible.** The code underneath still says `staff` throughout, tables, routes, function names, renaming all of that for a label change wasn't worth the risk.
+- **Shop assumes pickup in studio**, not delivery. An assumption, not a confirmed decision from Jay, easy to add shipping later if needed.
+
+## genuinely outstanding, needs Jay or a setup step, not more code
+
+- Resend domain isn't verified yet. Until it is, no real email actually sends (login codes, order confirmations, review nudges), they're all on Resend's test domain right now. `request-code.js`, `webhook.js`, and `reviews/request.js` all need the sender address swapped once a domain's verified.
+- `GOOGLE_REVIEW_URL` is a placeholder in two files (`reviews/request.js`, `reviews/click.js`), needs Jay's real Google Business Profile review link.
+- **All 3 seeded artist accounts are still on PIN `1234`.** The change-PIN feature exists at `/staff/profile`, each artist needs to actually use it.
+- Migration 004 assumed staff id 1 was Jay and marked that row `owner`. Worth confirming it landed on the right person, easy one-line fix if not: `UPDATE staff SET role = 'owner' WHERE id = X`.
+- Jay hasn't confirmed which merch items count toward the 6-stamp loyalty reward, the checkbox exists in the product form, just needs his call.
+- No "mark this reward as actually handed over" action exists anywhere. The stats dashboard shows stamps issued and rewards currently pending, not a redemption history, `loyalty_redemptions` sits unused in the schema. Worth building if Jay wants that history properly tracked.
+- Enquiry threads are text only, the schema's ready for letting a client attach one of the artist's own gallery photos as a reference (`gallery_ref_id`), just no picker UI built yet, low priority.
+- The icon-grid treatment only covers the two main home screens so far (client and artist). Same icon language could extend to smaller in-page links if wanted.
+- **VAPID keys need generating for the live deployment**, the setup section above has the exact steps. Without them, push notifications silently do nothing, the toggle UI works but nothing actually sends.
+
+## brand
+
+Rabbit-in-sunglasses as the focal mark, used a lot on purpose: app icon, splash, hero spot on both home screens, and the "meet the artists" nav icon is literally its sunglasses shape. Cyberpunk/vapor aesthetic throughout: deep black/navy background, hot pink and cyan as primary accents, amber for tags and labels, animated synthwave grid behind every screen. Motion is deliberate, not constant, ambient glow on icons and the rabbit, a glitch flash on stamp/reward moments, the grid scroll on the background, all of it turns off under `prefers-reduced-motion`. No em dashes, no emojis, no generic agency language anywhere in copy.
 
 ---
 Intellectual property of Sidedoor Digital.

@@ -2,6 +2,7 @@
 // Intellectual property of Sidedoor Digital
 
 import NavTile from "../components/NavTile.jsx";
+import NotificationToggle from "../components/NotificationToggle.jsx";
 import {
   LoyaltyCardIcon,
   SunglassesIcon,
@@ -23,13 +24,14 @@ export default function Home() {
       </p>
 
       <div className="watag-nav-grid">
-        <NavTile to="/card" icon={<LoyaltyCardIcon />} label="Loyalty card" />
-        <NavTile to="/artists" icon={<SunglassesIcon />} label="Meet the artists" />
-        <NavTile to="/calendar" icon={<CalendarIcon />} label="Who's working" />
-        <NavTile to="/messages" icon={<ChatIcon />} label="Message an artist" />
-        <NavTile to="/shop" icon={<ShopBagIcon />} label="Shop merch" />
-        <NavTile to="/referrals" icon={<GiftIcon />} label="Refer a friend" />
-        <NavTile to="/staff" icon={<LoginBadgeIcon />} label="Artist login" />
+        <NavTile index={0} to="/card" icon={<LoyaltyCardIcon />} label="Loyalty card" />
+        <NavTile index={1} to="/artists" icon={<SunglassesIcon />} label="Meet the artists" />
+        <NavTile index={2} to="/calendar" icon={<CalendarIcon />} label="Who's working" />
+        <NavTile index={3} to="/messages" icon={<ChatIcon />} label="Message an artist" />
+        <NavTile index={4} to="/shop" icon={<ShopBagIcon />} label="Shop merch" />
+        <NavTile index={5} to="/referrals" icon={<GiftIcon />} label="Refer a friend" />
+        <NavTile index={0} to="/staff" icon={<LoginBadgeIcon />} label="Artist login" />
+        <NotificationToggle />
       </div>
     </div>
   );

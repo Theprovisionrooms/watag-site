@@ -216,3 +216,15 @@ CREATE TABLE review_nudges (
   sent_at TEXT DEFAULT (datetime('now')),
   clicked_at TEXT
 );
+
+CREATE TABLE push_subscriptions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  owner_type TEXT NOT NULL,      -- 'client' | 'staff'
+  owner_id INTEGER NOT NULL,
+  endpoint TEXT UNIQUE NOT NULL,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX idx_push_subscriptions_owner ON push_subscriptions(owner_type, owner_id);
