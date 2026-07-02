@@ -28,7 +28,7 @@ Every feature from the original brief is live, plus everything agreed along the 
 | Artist directory | `/artists` | Client facing, photo, bio, gallery link, message button per artist |
 | Calendar | `/calendar`, `/staff/availability` | Colour coded per artist, artists set their own slots |
 | Gallery | `/staff/gallery`, `/artists/:id/gallery` | Each artist uploads their own portfolio, public read-only view per artist |
-| Enquiries | `/messages`, `/staff/messages` | Polling based chat threads, client ↔ artist, feels instant |
+| Enquiries | `/messages`, `/staff/messages` | Polling based chat threads, text or photo, either side can delete a message, artist can moderate any message in their thread |
 | Shop | `/shop`, `/staff/products` | Stripe checkout, owner-only product management, pickup in studio |
 | Waitlist | `/waitlist`, `/staff/waitlist` | Client requests a date that's not free, artists see who's waiting |
 | Review nudges | scan screen → email | Sent right after a stamp, click-tracked link through to the Google review |
@@ -129,7 +129,7 @@ Stripe webhook secret comes from Stripe dashboard → Developers → Webhooks �
 
 ## setup, existing database (this one)
 
-Migrations already run, in order, against the live database: `002`, `003`, `004`, `005`, `006`, all in `migrations/`. If recreating from scratch, `schema.sql` already matches the end state, the migrations folder is history, not something to re-run.
+Migrations already run, in order, against the live database: `002`, `003`, `004`, `005`, `006`, `007`, all in `migrations/`. If recreating from scratch, `schema.sql` already matches the end state, the migrations folder is history, not something to re-run.
 
 ## push notifications
 
@@ -184,6 +184,36 @@ wrangler d1 execute watag-db --file=./migrations/006_push_subscriptions.sql --re
 - Enquiry threads are text only, the schema's ready for letting a client attach one of the artist's own gallery photos as a reference (`gallery_ref_id`), just no picker UI built yet, low priority.
 - The icon-grid treatment only covers the two main home screens so far (client and artist). Same icon language could extend to smaller in-page links if wanted.
 - **VAPID keys need generating for the live deployment**, the setup section above has the exact steps. Without them, push notifications silently do nothing, the toggle UI works but nothing actually sends.
+- **Setback font file needs adding** at `public/fonts/Setback.ttf`, see the "fonts" section above for exactly where to get it. Headings fall back to Barlow Condensed cleanly until then.
+
+## fonts
+
+Headings now use **Setback TT BRK**, by Ænigma Fonts, a bitmap/stencil display face, free for commercial use, confirmed directly on the publisher's page. Not bundled in this repo, third-party font files are best grabbed from the source directly rather than redistributed through a client's codebase. To finish setting it up:
+
+1. Download it from **https://www.1001fonts.com/setback-tt-brk-font.html**
+2. Take the `.ttf` file out of the zip, rename it `Setback.ttf`
+3. Drop it at `public/fonts/Setback.ttf`
+4. Commit and push, it'll pick up automatically, `@font-face` is already wired in `global.css`
+
+Until that file's in place, headings fall back to Barlow Condensed cleanly, nothing breaks either way, this genuinely is a drop-in-and-go step whenever it's convenient.
+
+## wordmark
+
+The "WATAG" text heading on the home screen is now the client's own logo artwork (`public/icons/wordmark.png`) rather than typed text, with a slow ambient flicker (hue-rotate and a slight shift, not a hard glitch) so it reads as alive rather than static, the single biggest brand moment on the page.
+
+## ambient icon instability
+
+Every nav icon (not just the ones with a glow) now carries a second, irregular animation layered on top of the existing smooth pulse, short opacity dips and tiny skews at uneven, non-repeating-feeling intervals. Deliberately built at a duration that doesn't divide evenly into the existing pulse, so the two never fall back into sync, that's what reads as "slightly unstable" rather than a clean breathing loop. No interaction needed, this runs constantly, same as the request. Turns off completely under `prefers-reduced-motion`, same as everything else animated in the app.
+
+## message photos
+
+Clients and artists can now send a photo inside an enquiry thread, not just text, via the camera icon next to the message box.
+
+**Cost is handled client side, before a single byte reaches the server.** A phone camera photo is routinely 3-8MB. `src/utils/resizeImage.js` resizes it to a maximum 1440px edge and re-compresses to JPEG at 75% quality entirely in the browser, before upload, typically bringing it down to a few hundred KB with no visible quality loss on a phone screen. That's the real lever on storage and bandwidth cost, not something to solve after the fact.
+
+**Deletion is the other half of cost control.** Either the person who sent a message, or the artist in that thread (regardless of who sent it, this doubles as light moderation), can delete any message. Deleting one with a photo attached removes the R2 object immediately, not just the database row, so storage never just accumulates with no way to claw it back. No separate cleanup job needed.
+
+New endpoint: `functions/api/enquiries/upload-photo.js`, stores under `enquiries/<threadId>/`, returns a key referenced when the message itself gets created through the existing `/api/enquiries/messages` endpoint. `authoriseThread` (the ownership check) got pulled out into `functions/_lib/enquiries.js` since both endpoints need it now, rather than staying duplicated inside `messages.js`.
 
 ## home screen polish, this session
 

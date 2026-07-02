@@ -1,6 +1,17 @@
 /* WATAG — built by Sidedoor Digital
    Intellectual property of Sidedoor Digital */
 
+/* Setback TT BRK, by Ænigma Fonts, free for commercial use. Not bundled
+   here, drop the font file at public/fonts/Setback.ttf yourself (see
+   README "fonts" section for where to get it). Until it's there this
+   falls back to Barlow Condensed cleanly, nothing breaks either way. */
+@font-face {
+  font-family: "Setback";
+  src: url("/fonts/Setback.woff2") format("woff2"),
+       url("/fonts/Setback.ttf") format("truetype");
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -177,8 +188,23 @@ a {
   width: 48px;
   height: 48px;
   filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.5));
-  animation: watag-icon-pulse 4.5s ease-in-out infinite;
-  animation-delay: var(--watag-tile-delay, 0s);
+  animation: watag-icon-pulse 4.5s ease-in-out infinite, watag-icon-flicker 6.8s steps(1) infinite;
+  animation-delay: var(--watag-tile-delay, 0s), var(--watag-tile-delay, 0s);
+}
+
+/* deliberately irregular, uneven percentage gaps and a duration that
+   doesn't divide evenly into the pulse above, so the two never repeat
+   in sync, reads as "slightly unstable" rather than a clean breathing loop */
+@keyframes watag-icon-flicker {
+  0%, 100% { opacity: 1; transform: none; }
+  4% { opacity: 0.82; transform: skewX(-2deg); }
+  6% { opacity: 1; transform: none; }
+  47% { opacity: 1; transform: none; }
+  49% { opacity: 0.78; transform: skewX(2deg) translateX(0.5px); }
+  51% { opacity: 1; transform: none; }
+  83% { opacity: 1; transform: none; }
+  84% { opacity: 0.7; transform: skewX(-1.5deg); }
+  86% { opacity: 1; transform: none; }
 }
 
 .watag-nav-tile-label {
@@ -212,6 +238,29 @@ a {
   50% { filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.5)); }
 }
 
+/* wordmark, the WATAG lettering itself, ambient unstable flicker,
+   a little more pronounced than the nav icons since this is the
+   single biggest brand moment on the page */
+.watag-wordmark {
+  display: block;
+  margin: 0 auto;
+  width: 220px;
+  height: auto;
+  animation: watag-wordmark-flicker 7.4s steps(1) infinite;
+}
+
+@keyframes watag-wordmark-flicker {
+  0%, 100% { opacity: 1; filter: none; transform: none; }
+  3% { opacity: 0.86; filter: hue-rotate(8deg); transform: translateX(-1px); }
+  5% { opacity: 1; filter: none; transform: none; }
+  38% { opacity: 1; filter: none; transform: none; }
+  40% { opacity: 0.8; filter: hue-rotate(-10deg); transform: translateX(1px) skewX(1deg); }
+  42% { opacity: 1; filter: none; transform: none; }
+  71% { opacity: 1; filter: none; transform: none; }
+  72% { opacity: 0.75; filter: hue-rotate(12deg); transform: translateX(-1px); }
+  74% { opacity: 1; filter: none; transform: none; }
+}
+
 /* staggered entrance, a bit of fluff on load, each tile rises and fades in slightly after the last */
 @keyframes watag-tile-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -232,7 +281,8 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .watag-nav-tile-icon,
   .watag-icon-glitch,
-  .watag-hero-rabbit {
+  .watag-hero-rabbit,
+  .watag-wordmark {
     animation: none;
   }
 }

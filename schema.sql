@@ -184,6 +184,7 @@ CREATE TABLE enquiry_messages (
   sender_id INTEGER NOT NULL,
   body TEXT NOT NULL,
   gallery_ref_id INTEGER REFERENCES staff_gallery(id),  -- optional reference photo from artist's portfolio
+  photo_url TEXT,                     -- optional fresh photo attached to this message, stored in R2
   read_at TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );

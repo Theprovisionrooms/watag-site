@@ -152,3 +152,12 @@ export function BellIcon() {
     </svg>
   );
 }
+
+export function CameraIcon() {
+  return (
+    <svg {...base} strokeWidth={2.2}>
+      <path d="M6 15h6l3-4h10l3 4h6v22H6z" />
+      <circle cx="24" cy="26" r="7" />
+    </svg>
+  );
+}
