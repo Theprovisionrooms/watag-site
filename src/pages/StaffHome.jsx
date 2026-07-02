@@ -20,6 +20,7 @@ export default function StaffHome() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("artist");
   const [staffId, setStaffId] = useState(null);
+  const [heroGlitch, setHeroGlitch] = useState(true);
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
@@ -32,9 +33,19 @@ export default function StaffHome() {
     setRole(localStorage.getItem("watag_staff_role") || "artist");
   }, [navigate]);
 
+  useEffect(() => {
+    const t = setTimeout(() => setHeroGlitch(false), 400);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <div className="watag-screen">
-      <img src="/icons/icon-512.png" alt="" className="watag-hero-rabbit" style={{ width: 64, height: 64 }} />
+      <img
+        src="/icons/rabbit-hero.png"
+        alt=""
+        className={`watag-hero-rabbit ${heroGlitch ? "watag-glitch-once" : ""}`}
+        style={{ width: 88 }}
+      />
       <span className="watag-eyebrow" style={{ alignSelf: "center" }}>Artist</span>
       <h1 style={{ textAlign: "center" }}>Hey {name}</h1>
 
@@ -47,8 +58,8 @@ export default function StaffHome() {
         <NavTile index={5} to="/staff/waitlist" icon={<ClockIcon />} label="Waitlist" />
         {role === "owner" && (
           <>
-            <NavTile index={0} to="/staff/products" icon={<ShopBagIcon />} label="Manage shop" />
-            <NavTile index={1} to="/staff/stats" icon={<ChartIcon />} label="Stats" />
+            <NavTile index={6} to="/staff/products" icon={<ShopBagIcon />} label="Manage shop" />
+            <NavTile index={7} to="/staff/stats" icon={<ChartIcon />} label="Stats" />
           </>
         )}
         {staffId && <NotificationToggle staffId={staffId} />}

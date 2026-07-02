@@ -1,22 +1,34 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import NavTile from "../components/NavTile.jsx";
 import NotificationToggle from "../components/NotificationToggle.jsx";
 import {
   LoyaltyCardIcon,
   SunglassesIcon,
   CalendarIcon,
-  ChatIcon,
   ShopBagIcon,
   GiftIcon,
-  LoginBadgeIcon,
 } from "../components/icons.jsx";
 
 export default function Home() {
+  // one-off glitch flash on the rabbit as the page loads, this is the
+  // "fluff" moment, deliberately not a loop, fires once and settles
+  const [heroGlitch, setHeroGlitch] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setHeroGlitch(false), 400);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <div className="watag-screen">
-      <img src="/icons/icon-512.png" alt="WATAG" className="watag-hero-rabbit" />
+      <img
+        src="/icons/rabbit-hero.png"
+        alt="WATAG"
+        className={`watag-hero-rabbit ${heroGlitch ? "watag-glitch-once" : ""}`}
+      />
       <span className="watag-eyebrow" style={{ alignSelf: "center" }}>WATAG · Southport</span>
       <h1 style={{ fontSize: 32, textAlign: "center" }}>WATAG</h1>
       <p style={{ color: "var(--watag-text-dim)", textAlign: "center", marginTop: -8 }}>
@@ -27,12 +39,24 @@ export default function Home() {
         <NavTile index={0} to="/card" icon={<LoyaltyCardIcon />} label="Loyalty card" />
         <NavTile index={1} to="/artists" icon={<SunglassesIcon />} label="Meet the artists" />
         <NavTile index={2} to="/calendar" icon={<CalendarIcon />} label="Who's working" />
-        <NavTile index={3} to="/messages" icon={<ChatIcon />} label="Message an artist" />
-        <NavTile index={4} to="/shop" icon={<ShopBagIcon />} label="Shop merch" />
-        <NavTile index={5} to="/referrals" icon={<GiftIcon />} label="Refer a friend" />
-        <NavTile index={0} to="/staff" icon={<LoginBadgeIcon />} label="Artist login" />
+        <NavTile index={3} to="/shop" icon={<ShopBagIcon />} label="Shop merch" />
+        <NavTile index={4} to="/referrals" icon={<GiftIcon />} label="Refer a friend" />
         <NotificationToggle />
       </div>
+
+      <Link
+        to="/staff"
+        style={{
+          alignSelf: "center",
+          fontSize: 11,
+          color: "var(--watag-text-dim)",
+          opacity: 0.6,
+          textDecoration: "none",
+          marginTop: 8,
+        }}
+      >
+        artist login
+      </Link>
     </div>
   );
 }

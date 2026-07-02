@@ -56,7 +56,7 @@ a {
 }
 
 .watag-glitch-once {
-  animation: watag-glitch 320ms ease-in-out 1;
+  animation: watag-glitch 320ms ease-in-out 1 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -200,16 +200,33 @@ a {
 
 /* rabbit hero, ambient ember glow rather than constant motion */
 .watag-hero-rabbit {
-  width: 96px;
-  height: 96px;
+  width: 148px;
+  height: auto;
   display: block;
   margin: 0 auto;
   animation: watag-rabbit-glow 5s ease-in-out infinite;
 }
 
 @keyframes watag-rabbit-glow {
-  0%, 100% { filter: drop-shadow(0 0 14px rgba(233, 30, 140, 0.35)); }
-  50% { filter: drop-shadow(0 0 26px rgba(0, 229, 255, 0.45)); }
+  0%, 100% { filter: drop-shadow(0 0 16px rgba(233, 30, 140, 0.4)); }
+  50% { filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.5)); }
+}
+
+/* staggered entrance, a bit of fluff on load, each tile rises and fades in slightly after the last */
+@keyframes watag-tile-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.watag-nav-tile {
+  animation: watag-tile-in 420ms ease-out backwards;
+  animation-delay: var(--watag-tile-in-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watag-nav-tile {
+    animation: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

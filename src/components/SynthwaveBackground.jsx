@@ -37,12 +37,13 @@ export default function SynthwaveBackground() {
       ctx.clearRect(0, 0, w, h);
 
       const vx = w / 2;
-      const SEGS = 12;
-      const ROWS = 20;
+      const SEGS = 14;
+      const ROWS = 22;
 
-      // vertical lines radiating from vanishing point
+      // vertical lines radiating from vanishing point, overshoot the
+      // frame at the bottom so the grid reaches both edges with no gap
       for (let i = 0; i <= SEGS; i++) {
-        const xBottom = (i / SEGS) * w;
+        const xBottom = -0.25 * w + (i / SEGS) * w * 1.5;
         ctx.strokeStyle = "rgba(255, 45, 149, 0.4)";
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -51,13 +52,15 @@ export default function SynthwaveBackground() {
         ctx.stroke();
       }
 
-      // horizontal lines, perspective spaced, scrolling toward viewer
+      // horizontal lines, perspective spaced, scrolling toward viewer.
+      // width floor keeps rows near the horizon reasonably wide too,
+      // rather than tapering to near-zero and leaving dead space either side
       for (let i = 0; i < ROWS; i++) {
         const raw = ((i / ROWS) + offset) % 1;
-        const t = Math.pow(raw, 2);
+        const t = Math.pow(raw, 1.6);
         const y = t * h;
-        const lineW = t * w * 1.1;
-        const alpha = Math.min(t * 1.8, 0.55);
+        const lineW = (0.32 + 0.98 * t) * w;
+        const alpha = Math.min(0.2 + t * 1.6, 0.55);
 
         ctx.strokeStyle = `rgba(0, 229, 255, ${alpha})`;
         ctx.lineWidth = 1;

@@ -35,7 +35,7 @@ Every feature from the original brief is live, plus everything agreed along the 
 | Referrals | `/referrals` | Personal code + link, completes on the referred person's first stamp, bonus stamp for the referrer, leaderboard |
 | Stats dashboard | `/staff/stats` | Owner only, revenue, top sellers, client growth, loyalty volume, enquiry volume, review click rate |
 | Push notifications | bell tile, both home screens | Stamp/reward, referral bonus, new enquiry message, waitlist match, hand-rolled Web Push (no Node dependency) |
-| Visual system | site-wide | Animated canvas synthwave background, icon nav grid (enlarged, no card boxes), tap glitch, rabbit hero, brand gradient |
+| Visual system | site-wide | Animated canvas synthwave background (edge to edge, no dead space), transparent rabbit hero with intro glitch, staggered tile entrance, enlarged icon tap targets |
 | Install | site-wide | Custom install banner (Android) / instructions (iOS), PWA icons, manifest |
 
 Dropped from the plan on purpose: an aftercare guide page, decided not worth building.
@@ -184,6 +184,14 @@ wrangler d1 execute watag-db --file=./migrations/006_push_subscriptions.sql --re
 - Enquiry threads are text only, the schema's ready for letting a client attach one of the artist's own gallery photos as a reference (`gallery_ref_id`), just no picker UI built yet, low priority.
 - The icon-grid treatment only covers the two main home screens so far (client and artist). Same icon language could extend to smaller in-page links if wanted.
 - **VAPID keys need generating for the live deployment**, the setup section above has the exact steps. Without them, push notifications silently do nothing, the toggle UI works but nothing actually sends.
+
+## home screen polish, this session
+
+- **Rabbit hero is transparent now** (`public/icons/rabbit-hero.png`), no dark box around it, cropped tight and sized up (148px on the client home, smaller on the staff hub). The app icon files (`icon-192.png`/`icon-512.png`) keep their solid background deliberately, that's needed for the PWA install/manifest, only the on-page hero display changed.
+- **Intro glitch on load.** The rabbit fires the same RGB-split glitch already used on a successful stamp, once, on page mount, not looping. Nav tiles also get a light staggered fade-and-rise as they load in. Both respect `prefers-reduced-motion`.
+- **"Message an artist" removed from the client home grid.** Messaging isn't gone, every artist's own card on `/artists` has a message button, that's the flow now, message a specific person rather than "a" generic artist. The inbox list at `/messages` still exists and stays reachable via the back arrow inside any open conversation.
+- **Artist login demoted from a nav tile to a small quiet text link** at the bottom of the home screen, on purpose, a home-screen icon next to loyalty cards and the shop was inviting customers to poke at a login that isn't for them. Still one tap away, just not presented as a feature.
+- **Synthwave grid widened.** The horizontal lines were shrinking too fast near the horizon, leaving a bare triangle of dead space either side of the grid at the top of the floor. Widened the perspective curve so the grid reaches close to both edges throughout, not just at the very bottom.
 
 ## brand
 
