@@ -13,8 +13,8 @@ import { NavBack } from "../App.jsx";
 const TOKEN_TTL = 60;
 const TIERS = [
   { count: 3, label: "small tattoo" },
-  { count: 6, label: "merch" },
-  { count: 9, label: "3hr session" },
+  { count: 6, label: "session credit" },
+  { count: 9, label: "merch" },
 ];
 
 function useSession() {
@@ -248,10 +248,78 @@ export default function ClientLoyaltyCard() {
         </div>
       )}
 
+      <div className="watag-loyalty-card">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1 }}>
+          <img src="/icons/rabbit-hero.png" alt="" style={{ width: 34, height: "auto" }} />
+          <span style={{ fontSize: 10, letterSpacing: "0.14em", color: "var(--watag-text-dim)", textTransform: "uppercase" }}>
+            Loyalty card
+          </span>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(9, 1fr)",
+            gap: 6,
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => {
+            const earned = n <= stampCount;
+            const isTier = n % 3 === 0;
+            return (
+              <div
+                key={n}
+                style={{
+                  position: "relative",
+                  aspectRatio: "1",
+                  borderRadius: "50%",
+                  border: `1.5px solid ${isTier ? "var(--watag-amber)" : "rgba(255,255,255,0.12)"}`,
+                  background: earned ? "rgba(255,255,255,0.06)" : "transparent",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <img
+                  src="/icons/stamp-mark.png"
+                  alt=""
+                  style={{
+                    width: "72%",
+                    height: "72%",
+                    objectFit: "contain",
+                    filter: earned ? "drop-shadow(0 0 4px rgba(255,45,149,0.6))" : "grayscale(1)",
+                    opacity: earned ? 1 : 0.28,
+                    transition: "opacity 200ms, filter 200ms",
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", position: "relative", zIndex: 1 }}>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>{name || "Member"}</span>
+          <span style={{ fontSize: 11, color: "var(--watag-text-dim)" }}>{stampCount}/9 stamps</span>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        {TIERS.map((tier) => (
+          <span key={tier.count} style={{ fontSize: 11, color: "var(--watag-text-dim)", textTransform: "uppercase" }}>
+            {tier.count} · {tier.label}
+          </span>
+        ))}
+      </div>
+
       <div
         className={`watag-card ${justStamped ? "watag-glitch-once" : ""}`}
-        style={{ display: "flex", justifyContent: "center", padding: 32 }}
+        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: 32 }}
       >
+        <span style={{ fontSize: 11, color: "var(--watag-text-dim)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          scan to add a stamp
+        </span>
         <div style={{ position: "relative", width: 220, height: 220 }}>
           <svg width="220" height="220" style={{ position: "absolute", top: 0, left: 0, transform: "rotate(-90deg)" }}>
             <circle cx="110" cy="110" r="92" fill="none" stroke="var(--watag-bg)" strokeWidth="6" />
@@ -290,31 +358,6 @@ export default function ClientLoyaltyCard() {
       <p style={{ textAlign: "center", color: "var(--watag-text-dim)", fontSize: 13, margin: 0 }}>
         code refreshes in {secondsLeft}s, hand your phone to staff to scan
       </p>
-
-      <div className="watag-card">
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-          {TIERS.map((tier) => (
-            <span key={tier.count} style={{ fontSize: 11, color: "var(--watag-text-dim)", textTransform: "uppercase" }}>
-              {tier.count} · {tier.label}
-            </span>
-          ))}
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => (
-            <div
-              key={n}
-              style={{
-                flex: 1,
-                aspectRatio: "1",
-                borderRadius: "50%",
-                border: `2px solid ${n % 3 === 0 ? "var(--watag-amber)" : "var(--watag-border)"}`,
-                background: n <= stampCount ? "var(--watag-pink)" : "transparent",
-                transition: "background 200ms",
-              }}
-            />
-          ))}
-        </div>
-      </div>
 
       <button onClick={clear} style={{ background: "none", border: "none", color: "var(--watag-text-dim)", fontSize: 12 }}>
         not you? switch profile

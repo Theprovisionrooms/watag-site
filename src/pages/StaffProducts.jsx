@@ -97,7 +97,7 @@ export default function StaffProducts() {
             checked={form.loyaltyEligible}
             onChange={(e) => setForm({ ...form, loyaltyEligible: e.target.checked })}
           />
-          eligible for the 6 stamp loyalty reward
+          eligible for the 9 stamp loyalty reward
         </label>
         <button
           onClick={addProduct}

@@ -10,6 +10,7 @@ export default function StaffThread() {
   const navigate = useNavigate();
   const [staffId, setStaffId] = useState(null);
   const [otherName, setOtherName] = useState("conversation");
+  const [otherPhone, setOtherPhone] = useState(null);
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
@@ -22,7 +23,10 @@ export default function StaffThread() {
       .then((res) => res.json())
       .then((threads) => {
         const match = threads.find((t) => String(t.id) === threadId);
-        if (match) setOtherName(match.other_name);
+        if (match) {
+          setOtherName(match.other_name);
+          setOtherPhone(match.other_phone || null);
+        }
       });
   }, [navigate, threadId]);
 
@@ -33,6 +37,7 @@ export default function StaffThread() {
       threadId={threadId}
       identity={{ type: "staff", staffId }}
       otherName={otherName}
+      subtitle={otherPhone}
       backTo="/staff/messages"
       accentColor="var(--watag-cyan)"
     />

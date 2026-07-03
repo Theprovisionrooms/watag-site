@@ -29,7 +29,6 @@ export default function Home() {
         alt="WATAG"
         className={`watag-hero-rabbit ${heroGlitch ? "watag-glitch-once" : ""}`}
       />
-      <span className="watag-eyebrow" style={{ alignSelf: "center" }}>WATAG · Southport</span>
       <img src="/icons/wordmark.png" alt="WATAG" className="watag-wordmark" />
       <p style={{ color: "var(--watag-text-dim)", textAlign: "center", marginTop: -8 }}>
         Loyalty card, gallery, bookings and shop, all in one place.

@@ -215,6 +215,17 @@ Clients and artists can now send a photo inside an enquiry thread, not just text
 
 New endpoint: `functions/api/enquiries/upload-photo.js`, stores under `enquiries/<threadId>/`, returns a key referenced when the message itself gets created through the existing `/api/enquiries/messages` endpoint. `authoriseThread` (the ownership check) got pulled out into `functions/_lib/enquiries.js` since both endpoints need it now, rather than staying duplicated inside `messages.js`.
 
+## loyalty card, this session
+
+- **Merch and session credit swapped.** Merch is now the 9 stamp tier, the top prize, session credit dropped to 6. Every place that referenced the old order (the scan endpoint, the card status endpoint, the product form's "eligible for the loyalty reward" checkbox) is updated to match. `TIER_REWARDS` in `functions/api/loyalty/scan.js` is the one place that actually controls this, if it ever needs changing again, that's the source of truth.
+- **The card now actually looks like a card.** Real proportions (credit-card ratio), a dark gradient body, a slow holographic sheen sweeping across it. Each of the 9 stamps uses the client's own logo mark (`public/icons/stamp-mark.png`) rather than a plain dot, dim and greyscale until earned, full colour with a glow once it lands. The 3/6/9 tier positions get an amber ring so they read as the prize points they are.
+- **QR scanning stayed a separate panel below the card**, on purpose, a real physical card doesn't have a QR code on its face, so the card shows the stamps (the object itself) and the panel underneath is the scan terminal (the mechanism), keeps each part doing one job.
+- **The "WATAG · Southport" eyebrow tag above the wordmark is gone.** The logo already carries the branding, it was redundant.
+
+## messaging, this session
+
+An artist opening a client's enquiry thread now sees the client's phone number too, not just their name, both in the inbox list and at the top of the conversation itself. Comes straight off the `clients` table, no new field needed, `threads.js` just wasn't selecting it before. Clients still only ever see the artist's name, not a phone number, that side's unchanged.
+
 ## home screen polish, this session
 
 - **Rabbit hero is transparent now** (`public/icons/rabbit-hero.png`), no dark box around it, cropped tight and sized up (148px on the client home, smaller on the staff hub). The app icon files (`icon-192.png`/`icon-512.png`) keep their solid background deliberately, that's needed for the PWA install/manifest, only the on-page hero display changed.

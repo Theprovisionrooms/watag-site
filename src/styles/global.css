@@ -225,6 +225,48 @@ a {
 }
 
 /* rabbit hero, ambient ember glow rather than constant motion */
+/* physical loyalty card face, credit-card proportions, a holographic
+   sheen sweeps across it slowly, catching the light the way a real
+   card would if you tilted it */
+.watag-loyalty-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.586 / 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a0b24 0%, #3a1030 45%, #1a0b24 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.watag-loyalty-card::before {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 55%;
+  height: 220%;
+  background: linear-gradient(75deg, transparent 0%, rgba(0, 229, 255, 0.12) 45%, rgba(255, 45, 149, 0.2) 52%, transparent 62%);
+  animation: watag-card-sheen 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes watag-card-sheen {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(230%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watag-loyalty-card::before {
+    animation: none;
+    display: none;
+  }
+}
+
 .watag-hero-rabbit {
   width: 148px;
   height: auto;

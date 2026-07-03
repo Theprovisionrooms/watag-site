@@ -6,10 +6,10 @@
 // token gets posted here. Validates the token, applies the stamp, and
 // flags a reward if the client has hit 3, 6 or 9 stamps.
 //
-// Reward tiers (locked with Jay):
+// Reward tiers (locked with Jay, merch and session credit swapped since):
 //   3 stamps -> small tattoo
-//   6 stamps -> item of merch, client chooses from the loyalty-eligible list
-//   9 stamps -> 3 hour session credit, card resets to 0 once redeemed
+//   6 stamps -> 3 hour session credit
+//   9 stamps -> item of merch, client chooses from the loyalty-eligible list, card resets to 0 once redeemed
 //
 // If this is someone's first ever stamp and they signed up through a
 // referral link, that referral completes here and the person who
@@ -25,8 +25,8 @@ const STAMP_COOLDOWN_SECONDS = 120;
 
 const TIER_REWARDS = {
   3: "small_tattoo",
-  6: "merch",
-  9: "session_credit",
+  6: "session_credit",
+  9: "merch",
 };
 
 async function applyStamp(db, clientId, staffId) {

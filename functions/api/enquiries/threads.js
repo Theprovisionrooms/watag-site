@@ -24,10 +24,10 @@ export async function onRequestGet({ request, env }) {
 
   const query =
     viewer.type === "client"
-      ? `SELECT t.id, s.name AS other_name, s.calendar_color AS other_color, t.last_message_at
+      ? `SELECT t.id, s.name AS other_name, s.calendar_color AS other_color, NULL AS other_phone, t.last_message_at
          FROM enquiry_threads t JOIN staff s ON s.id = t.staff_id
          WHERE t.client_id = ? ORDER BY t.last_message_at DESC`
-      : `SELECT t.id, c.name AS other_name, NULL AS other_color, t.last_message_at
+      : `SELECT t.id, c.name AS other_name, NULL AS other_color, c.phone AS other_phone, t.last_message_at
          FROM enquiry_threads t JOIN clients c ON c.id = t.client_id
          WHERE t.staff_id = ? ORDER BY t.last_message_at DESC`;
 

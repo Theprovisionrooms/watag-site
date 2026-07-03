@@ -32,7 +32,7 @@ function postHeaders(identity) {
   return headers;
 }
 
-export default function MessageThread({ threadId, identity, otherName, backTo, accentColor = "var(--watag-pink)" }) {
+export default function MessageThread({ threadId, identity, otherName, subtitle, backTo, accentColor = "var(--watag-pink)" }) {
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
@@ -110,6 +110,7 @@ export default function MessageThread({ threadId, identity, otherName, backTo, a
     <div className="watag-screen" style={{ paddingBottom: 16 }}>
       <NavBack to={backTo} label={otherName} />
       <h1 style={{ fontSize: 26 }}>{otherName}</h1>
+      {subtitle && <p style={{ marginTop: -16, color: "var(--watag-cyan)", fontSize: 13 }}>{subtitle}</p>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
         {messages.map((m) => {

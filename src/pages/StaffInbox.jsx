@@ -41,6 +41,9 @@ export default function StaffInbox() {
           >
             <div>
               <strong>{t.other_name}</strong>
+              {t.other_phone && (
+                <span style={{ display: "block", fontSize: 12, color: "var(--watag-cyan)" }}>{t.other_phone}</span>
+              )}
               <p style={{ margin: "4px 0 0", color: "var(--watag-text-dim)", fontSize: 13 }}>{t.lastMessage || "no messages yet"}</p>
             </div>
             {t.unreadCount > 0 && (
