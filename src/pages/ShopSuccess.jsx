@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 export default function ShopSuccess() {
   return (
     <div className="watag-screen">
-      <span className="watag-eyebrow">Order placed</span>
       <h1>Sorted</h1>
       <p style={{ color: "var(--watag-text-dim)" }}>
         You'll get a confirmation email shortly. Ready to collect in studio.

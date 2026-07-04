@@ -17,7 +17,6 @@ export default function ReferralLanding() {
 
   return (
     <div className="watag-screen">
-      <span className="watag-eyebrow">You're invited</span>
       <h1>Welcome to WATAG</h1>
       <p style={{ color: "var(--watag-text-dim)" }}>
         Someone's pointed you our way. Set up your card and you're in.

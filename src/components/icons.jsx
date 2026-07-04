@@ -161,3 +161,15 @@ export function CameraIcon() {
     </svg>
   );
 }
+
+export function AftercareIcon() {
+  return (
+    <svg {...base}>
+      <rect x="10" y="10" width="28" height="28" rx="6" transform="rotate(45 24 24)" />
+      <circle cx="18" cy="18" r="1.6" fill="url(#watagIconGradient)" />
+      <circle cx="30" cy="18" r="1.6" fill="url(#watagIconGradient)" />
+      <circle cx="18" cy="30" r="1.6" fill="url(#watagIconGradient)" />
+      <circle cx="30" cy="30" r="1.6" fill="url(#watagIconGradient)" />
+    </svg>
+  );
+}

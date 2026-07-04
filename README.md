@@ -35,7 +35,9 @@ Every feature from the original brief is live, plus everything agreed along the 
 | Referrals | `/referrals` | Personal code + link, completes on the referred person's first stamp, bonus stamp for the referrer, leaderboard |
 | Stats dashboard | `/staff/stats` | Owner only, revenue, top sellers, client growth, loyalty volume, enquiry volume, review click rate |
 | Push notifications | bell tile, both home screens | Stamp/reward, referral bonus, new enquiry message, waitlist match, hand-rolled Web Push (no Node dependency) |
-| Visual system | site-wide | Animated canvas synthwave background (edge to edge, no dead space), transparent rabbit hero with intro glitch, staggered tile entrance, enlarged icon tap targets |
+| Waitlist | `/waitlist`, `/staff/waitlist` | Real approve/decline workflow, locked to the specific artist requested if one was picked, push notification either way |
+| Aftercare guide | `/aftercare` | Generic, standard tattoo aftercare information |
+| Visual system | site-wide | Animated brand scene background (client's own artwork), physical loyalty card with grain texture, transparent rabbit hero with intro glitch and idle float, staggered tile entrance, enlarged icon tap targets |
 | Install | site-wide | Custom install banner (Android) / instructions (iOS), PWA icons, manifest |
 
 Dropped from the plan on purpose: an aftercare guide page, decided not worth building.
@@ -129,7 +131,7 @@ Stripe webhook secret comes from Stripe dashboard → Developers → Webhooks �
 
 ## setup, existing database (this one)
 
-Migrations already run, in order, against the live database: `002`, `003`, `004`, `005`, `006`, `007`, all in `migrations/`. If recreating from scratch, `schema.sql` already matches the end state, the migrations folder is history, not something to re-run.
+Migrations already run, in order, against the live database: `002`, `003`, `004`, `005`, `006`, `007`, `008`, all in `migrations/`. If recreating from scratch, `schema.sql` already matches the end state, the migrations folder is history, not something to re-run.
 
 ## push notifications
 
@@ -233,6 +235,30 @@ An artist opening a client's enquiry thread now sees the client's phone number t
 - **"Message an artist" removed from the client home grid.** Messaging isn't gone, every artist's own card on `/artists` has a message button, that's the flow now, message a specific person rather than "a" generic artist. The inbox list at `/messages` still exists and stays reachable via the back arrow inside any open conversation.
 - **Artist login demoted from a nav tile to a small quiet text link** at the bottom of the home screen, on purpose, a home-screen icon next to loyalty cards and the shop was inviting customers to poke at a login that isn't for them. Still one tap away, just not presented as a feature.
 - **Synthwave grid widened.** The horizontal lines were shrinking too fast near the horizon, leaving a bare triangle of dead space either side of the grid at the top of the floor. Widened the perspective curve so the grid reaches close to both edges throughout, not just at the very bottom.
+
+## text cleanup, this session
+
+Removed the small amber "eyebrow" label from every screen where it was just restating the page's own heading or icon, since the app's icon-driven now and doesn't need a text label repeating what's already obvious (calendar, artists directory, shop, referrals, waitlist, staff hub, and so on). Kept the ones that carry real information nothing else on screen conveys: "Check your email" during the login code step, and "Owner only" on the stats dashboard. Also removed the big "{name}'s card" heading from the loyalty card screen, the physical card visual itself already shows the name and stamp count directly on its face, having it twice was redundant. And dropped the "Loyalty card, gallery, bookings and shop, all in one place" line from the home screen, the icon grid speaks for itself now.
+
+## loyalty card background, this session
+
+The card's background is now a moody magenta-to-blue radial glow with a procedural film-grain texture, aiming for the same neon-portrait mood as the reference image without reproducing it directly. Worth being upfront about why: that reference looked like a stock wallpaper pulled from a wallpaper aggregator site, not something WATAG has commercial rights to, so it isn't embedded in the app. If there's a photo Jay actually owns or holds a licence for, happy to swap it in properly, just needs confirming.
+
+## animated app background, this session
+
+The synthwave canvas grid is gone, replaced with the client's own commissioned scene artwork (`public/backgrounds/scene.webp`, converted from the original PNG, 2.3MB down to about 160KB so it doesn't weigh down every page load) as the fixed backdrop behind every screen. It has "WATAG" and the mascot baked directly into the artwork, clearly a real brand asset rather than stock material, so no concern using it as-is. It has a slow, continuous drift and zoom rather than sitting static, and a dark gradient overlay keeps foreground text legible against its brighter centre. Turns static (no animation) under `prefers-reduced-motion`, same as everything else.
+
+## a little more flair, this session
+
+The hero rabbit now drifts gently around its own space (a slow float and slight rotation, layered on top of its existing glow, they're different CSS properties so they don't fight each other) rather than sitting perfectly still. Every nav tile got the same idea applied more subtly, floating up and down a couple of pixels, layered on the tile itself rather than the icon inside it, since the icon already has its own pulse and flicker running and stacking a third transform-based animation directly on it would have just fought with those instead of combining. Both turn off entirely under `prefers-reduced-motion`.
+
+## waitlist approval, this session
+
+Waitlist entries now go through a real pending → approved/declined flow rather than just sitting there until someone deletes them. If a client asked for a specific artist, only that artist can approve or decline it, the server enforces this, not just the UI. If they were happy with "any artist", whoever gets there first can action it, and that locks the entry to them afterwards so it's clear who actually picked it up. Either outcome sends the client a push notification. Clients can see the status of their own requests at `/waitlist` underneath the join form.
+
+## aftercare guide, this session
+
+Back on the plan after being dropped earlier. `/aftercare`, generic standard tattoo aftercare guidance written fresh for this app rather than lifted from any specific source, first 24 hours, the first two weeks, signs to get checked out, and longer term care. Deliberately generic, "just a normal one" per the brief, not tailored per artist or per piece, the copy itself says an artist's own instructions for a specific tattoo always come first.
 
 ## brand
 

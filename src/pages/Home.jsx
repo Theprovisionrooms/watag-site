@@ -11,6 +11,7 @@ import {
   CalendarIcon,
   ShopBagIcon,
   GiftIcon,
+  AftercareIcon,
 } from "../components/icons.jsx";
 
 export default function Home() {
@@ -30,9 +31,6 @@ export default function Home() {
         className={`watag-hero-rabbit ${heroGlitch ? "watag-glitch-once" : ""}`}
       />
       <img src="/icons/wordmark.png" alt="WATAG" className="watag-wordmark" />
-      <p style={{ color: "var(--watag-text-dim)", textAlign: "center", marginTop: -8 }}>
-        Loyalty card, gallery, bookings and shop, all in one place.
-      </p>
 
       <div className="watag-nav-grid">
         <NavTile index={0} to="/card" icon={<LoyaltyCardIcon />} label="Loyalty card" />
@@ -40,6 +38,7 @@ export default function Home() {
         <NavTile index={2} to="/calendar" icon={<CalendarIcon />} label="Who's working" />
         <NavTile index={3} to="/shop" icon={<ShopBagIcon />} label="Shop merch" />
         <NavTile index={4} to="/referrals" icon={<GiftIcon />} label="Refer a friend" />
+        <NavTile index={5} to="/aftercare" icon={<AftercareIcon />} label="Aftercare guide" />
         <NotificationToggle />
       </div>
 

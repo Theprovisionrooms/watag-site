@@ -44,7 +44,6 @@ export default function Referrals() {
   return (
     <div className="watag-screen">
       <NavBack />
-      <span className="watag-eyebrow">Refer a friend</span>
       <h1>Your link</h1>
       <p style={{ color: "var(--watag-text-dim)" }}>
         Share this with a mate. Once they've signed up and been in for their first session, you'll get a bonus stamp.
@@ -73,7 +72,6 @@ export default function Referrals() {
 
       {leaderboard.length > 0 && (
         <div>
-          <span className="watag-eyebrow">Top referrers</span>
           <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 10 }}>
             {leaderboard.map((entry, i) => (
               <div key={i} className="watag-card" style={{ display: "flex", justifyContent: "space-between", padding: "10px 16px" }}>

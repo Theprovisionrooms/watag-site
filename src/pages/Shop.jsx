@@ -61,7 +61,6 @@ export default function Shop() {
   return (
     <div className="watag-screen">
       <NavBack />
-      <span className="watag-eyebrow">Shop</span>
       <h1>Merch</h1>
       <p style={{ color: "var(--watag-text-dim)" }}>Pay online, collect in studio, no postage on this one.</p>
 

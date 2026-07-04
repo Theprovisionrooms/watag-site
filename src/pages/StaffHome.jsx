@@ -46,7 +46,7 @@ export default function StaffHome() {
         className={`watag-hero-rabbit ${heroGlitch ? "watag-glitch-once" : ""}`}
         style={{ width: 88 }}
       />
-      <span className="watag-eyebrow" style={{ alignSelf: "center" }}>Artist</span>
+
       <h1 style={{ textAlign: "center" }}>Hey {name}</h1>
 
       <div className="watag-nav-grid">

@@ -53,7 +53,6 @@ export default function Calendar() {
   return (
     <div className="watag-screen">
       <NavBack />
-      <span className="watag-eyebrow">This week</span>
       <h1 style={{ fontSize: 32 }}>Who's working</h1>
 
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>

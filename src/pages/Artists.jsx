@@ -61,7 +61,6 @@ export default function Artists() {
   return (
     <div className="watag-screen">
       <NavBack />
-      <span className="watag-eyebrow">Meet the team</span>
       <h1>Artists</h1>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

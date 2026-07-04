@@ -11,6 +11,7 @@ import ClientThread from "./pages/ClientThread.jsx";
 import Artists from "./pages/Artists.jsx";
 import ArtistGallery from "./pages/ArtistGallery.jsx";
 import Referrals from "./pages/Referrals.jsx";
+import Aftercare from "./pages/Aftercare.jsx";
 import ReferralLanding from "./pages/ReferralLanding.jsx";
 import Shop from "./pages/Shop.jsx";
 import ShopSuccess from "./pages/ShopSuccess.jsx";
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/artists" element={<Artists />} />
         <Route path="/artists/:staffId/gallery" element={<ArtistGallery />} />
         <Route path="/referrals" element={<Referrals />} />
+        <Route path="/aftercare" element={<Aftercare />} />
         <Route path="/r/:code" element={<ReferralLanding />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/shop/success" element={<ShopSuccess />} />

@@ -1,109 +1,36 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
+//
+// Fixed full-screen backdrop built around the client's own commissioned
+// scene artwork (public/backgrounds/scene.webp), animated with a slow
+// continuous drift and zoom rather than sitting static. A dark overlay
+// gradient keeps foreground text legible against the bright centre of
+// the artwork. Sits behind every screen via the App-level mount, never
+// scrolls with content.
 
-import { useEffect, useRef, useMemo } from "react";
+import { useMemo } from "react";
 
 export default function SynthwaveBackground() {
-  const canvasRef = useRef(null);
-
   const stars = useMemo(
     () =>
-      Array.from({ length: 50 }, () => ({
+      Array.from({ length: 40 }, () => ({
         x: Math.random() * 100,
-        y: Math.random() * 55,
-        r: Math.random() * 1.2 + 0.3,
-        o: Math.random() * 0.6 + 0.3,
+        y: Math.random() * 100,
+        r: Math.random() * 1.1 + 0.3,
+        o: Math.random() * 0.5 + 0.25,
       })),
     []
   );
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let animFrame;
-    let offset = 0;
-
-    function resize() {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    }
-
-    function draw() {
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-
-      const vx = w / 2;
-      const SEGS = 14;
-      const ROWS = 22;
-
-      // vertical lines radiating from vanishing point, overshoot the
-      // frame at the bottom so the grid reaches both edges with no gap
-      for (let i = 0; i <= SEGS; i++) {
-        const xBottom = -0.25 * w + (i / SEGS) * w * 1.5;
-        ctx.strokeStyle = "rgba(255, 45, 149, 0.4)";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(vx, 0);
-        ctx.lineTo(xBottom, h);
-        ctx.stroke();
-      }
-
-      // horizontal lines, perspective spaced, scrolling toward viewer.
-      // width floor keeps rows near the horizon reasonably wide too,
-      // rather than tapering to near-zero and leaving dead space either side
-      for (let i = 0; i < ROWS; i++) {
-        const raw = ((i / ROWS) + offset) % 1;
-        const t = Math.pow(raw, 1.6);
-        const y = t * h;
-        const lineW = (0.32 + 0.98 * t) * w;
-        const alpha = Math.min(0.2 + t * 1.6, 0.55);
-
-        ctx.strokeStyle = `rgba(0, 229, 255, ${alpha})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(vx - lineW / 2, y);
-        ctx.lineTo(vx + lineW / 2, y);
-        ctx.stroke();
-      }
-
-      if (!prefersReducedMotion) {
-        offset = (offset + 0.004) % 1;
-        animFrame = requestAnimationFrame(draw);
-      }
-    }
-
-    resize();
-    draw();
-
-    const onResize = () => {
-      resize();
-      if (prefersReducedMotion) draw();
-    };
-    window.addEventListener("resize", onResize);
-
-    return () => {
-      cancelAnimationFrame(animFrame);
-      window.removeEventListener("resize", onResize);
-    };
-  }, []);
-
   return (
     <div className="watag-synth-bg" aria-hidden="true">
-      <div className="watag-synth-sky">
-        <svg className="watag-synth-stars" width="100%" height="100%">
-          {stars.map((s, i) => (
-            <circle key={i} cx={`${s.x}%`} cy={`${s.y}%`} r={s.r} fill="#fff" opacity={s.o} />
-          ))}
-        </svg>
-      </div>
-      <div className="watag-synth-horizon" />
-      <div className="watag-synth-grid-wrap">
-        <canvas ref={canvasRef} style={{ display: "block", width: "100%", height: "100%" }} />
-      </div>
+      <svg className="watag-synth-stars" width="100%" height="100%">
+        {stars.map((s, i) => (
+          <circle key={i} cx={`${s.x}%`} cy={`${s.y}%`} r={s.r} fill="#fff" opacity={s.o} />
+        ))}
+      </svg>
+      <div className="watag-scene-image" />
+      <div className="watag-scene-overlay" />
     </div>
   );
 }

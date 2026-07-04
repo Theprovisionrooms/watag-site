@@ -1,14 +1,21 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
+//
+// Pending requests get approve/decline. Requests tied to a specific
+// artist can only be actioned by that artist, the server enforces
+// this too, this just avoids offering a button that would fail anyway.
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavBack } from "../App.jsx";
 
+const STATUS_COLOR = { pending: "var(--watag-amber)", approved: "var(--watag-cyan)", declined: "var(--watag-text-dim)" };
+
 export default function StaffWaitlist() {
   const navigate = useNavigate();
   const [staffId, setStaffId] = useState(null);
   const [entries, setEntries] = useState([]);
+  const [acting, setActing] = useState(null);
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
@@ -24,6 +31,17 @@ export default function StaffWaitlist() {
     fetch(`/api/waitlist?staffId=${id}`)
       .then((res) => res.json())
       .then(setEntries);
+  }
+
+  async function act(id, action) {
+    setActing(id);
+    await fetch("/api/waitlist", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ id, action, staffId }),
+    });
+    setActing(null);
+    load(staffId);
   }
 
   async function clear(id) {
@@ -50,10 +68,36 @@ export default function StaffWaitlist() {
                 <p style={{ margin: "4px 0 0", color: "var(--watag-amber)", fontSize: 13 }}>wants {e.requested_date}</p>
                 {e.notes && <p style={{ margin: "4px 0 0", fontSize: 13 }}>{e.notes}</p>}
               </div>
-              <button onClick={() => clear(e.id)} style={{ background: "none", border: "none", color: "var(--watag-text-dim)", fontSize: 13 }}>
-                done
-              </button>
+              <span style={{ fontSize: 11, textTransform: "uppercase", color: STATUS_COLOR[e.status], flexShrink: 0 }}>
+                {e.status}
+              </span>
             </div>
+
+            {e.status === "pending" ? (
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <button
+                  onClick={() => act(e.id, "approve")}
+                  disabled={acting === e.id}
+                  style={{ flex: 1, background: "var(--watag-cyan)", color: "#000", border: "none", borderRadius: 8, padding: 8, fontWeight: 700, fontSize: 13 }}
+                >
+                  approve
+                </button>
+                <button
+                  onClick={() => act(e.id, "decline")}
+                  disabled={acting === e.id}
+                  style={{ flex: 1, background: "none", border: "1px solid var(--watag-border)", color: "var(--watag-text-dim)", borderRadius: 8, padding: 8, fontSize: 13 }}
+                >
+                  decline
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => clear(e.id)}
+                style={{ marginTop: 8, background: "none", border: "none", color: "var(--watag-text-dim)", fontSize: 12 }}
+              >
+                remove from list
+              </button>
+            )}
           </div>
         ))}
         {entries.length === 0 && <p style={{ color: "var(--watag-text-dim)", textAlign: "center" }}>nobody waiting right now</p>}

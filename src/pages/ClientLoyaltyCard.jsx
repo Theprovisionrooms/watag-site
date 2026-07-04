@@ -121,7 +121,6 @@ function ProfileEntry({ onVerified }) {
   return (
     <div className="watag-screen">
       <NavBack />
-      <span className="watag-eyebrow">Your card</span>
       <h1>Find your card</h1>
       <p style={{ color: "var(--watag-text-dim)" }}>
         This is only needed once on this phone. After this you're straight in every time, no code, no typing.
@@ -236,8 +235,6 @@ export default function ClientLoyaltyCard() {
   return (
     <div className="watag-screen">
       <NavBack />
-      <span className="watag-eyebrow">Loyalty passport</span>
-      <h1 style={{ fontSize: 32 }}>{name ? `${name}'s card` : "Your card"}</h1>
 
       {pendingReward && (
         <div className="watag-card" style={{ borderColor: "var(--watag-amber)" }}>

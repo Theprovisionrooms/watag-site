@@ -44,7 +44,6 @@ export default function ClientMessages() {
   return (
     <div className="watag-screen">
       <NavBack to="/" label="home" />
-      <span className="watag-eyebrow">Messages</span>
       <h1>Your conversations</h1>
 
       {threads.length > 0 && (
@@ -71,7 +70,6 @@ export default function ClientMessages() {
       )}
 
       <div>
-        <span className="watag-eyebrow">Message an artist</span>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}>
           {staff.map((s) => (
             <button

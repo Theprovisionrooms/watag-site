@@ -205,9 +205,10 @@ CREATE TABLE referrals (
 CREATE TABLE waitlist (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   client_id INTEGER NOT NULL REFERENCES clients(id),
-  staff_id INTEGER REFERENCES staff(id),
+  staff_id INTEGER REFERENCES staff(id),   -- specific artist requested, or NULL for "any artist"
   requested_date TEXT,
   notes TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',  -- pending | approved | declined
   created_at TEXT DEFAULT (datetime('now'))
 );
 
