@@ -240,9 +240,9 @@ An artist opening a client's enquiry thread now sees the client's phone number t
 
 Removed the small amber "eyebrow" label from every screen where it was just restating the page's own heading or icon, since the app's icon-driven now and doesn't need a text label repeating what's already obvious (calendar, artists directory, shop, referrals, waitlist, staff hub, and so on). Kept the ones that carry real information nothing else on screen conveys: "Check your email" during the login code step, and "Owner only" on the stats dashboard. Also removed the big "{name}'s card" heading from the loyalty card screen, the physical card visual itself already shows the name and stamp count directly on its face, having it twice was redundant. And dropped the "Loyalty card, gallery, bookings and shop, all in one place" line from the home screen, the icon grid speaks for itself now.
 
-## loyalty card background, this session
+## loyalty card background
 
-The card's background is now a moody magenta-to-blue radial glow with a procedural film-grain texture, aiming for the same neon-portrait mood as the reference image without reproducing it directly. Worth being upfront about why: that reference looked like a stock wallpaper pulled from a wallpaper aggregator site, not something WATAG has commercial rights to, so it isn't embedded in the app. If there's a photo Jay actually owns or holds a licence for, happy to swap it in properly, just needs confirming.
+Went with an original moody radial-glow-plus-grain treatment first, avoiding the stock wallpaper reference image since that one wasn't something WATAG had rights to use commercially. Since settled on the client's own branded scene artwork instead (`public/backgrounds/scene.webp`, the same file originally tried as the full app background), scaled to fit inside the card rather than cropped (`background-size: contain`), sat over a dark gradient fill so any letterboxed space still looks intentional, with a subtle dark tint over the top so the stamps and card text stay legible against a busier image than a flat gradient. Same holographic sheen animation as before still sweeps across the top of it.
 
 ## animated app background
 
@@ -250,7 +250,7 @@ Went through two other approaches first (the client's branded scene artwork as a
 
 **Autoplay specifics worth knowing:** `muted` and `playsInline` are both required for this to autoplay on mobile Safari and Chrome, no exceptions, browsers block autoplay with sound entirely regardless of any other setting, that's not something to work around, it's a hard platform rule. Under `prefers-reduced-motion`, the video is explicitly paused via JS rather than just visually hidden, so a device with motion turned down isn't left silently decoding video in the background for no visible reason.
 
-`public/backgrounds/scene.webp` (the branded artwork from the second attempt) is still sitting in the repo unused, in case it's handy later for something like a splash screen or a shop banner, safe to delete if it's never needed.
+`public/backgrounds/scene.webp` (the branded artwork from the second background attempt) ended up finding a home after all, it's now the loyalty card's own background, see "loyalty card background" below.
 
 ## a little more flair, this session
 

@@ -208,11 +208,10 @@ a {
 }
 
 /* rabbit hero, ambient ember glow rather than constant motion */
-/* physical loyalty card face, credit-card proportions. Background is a
-   moody magenta-to-blue radial glow with a procedural film-grain
-   texture (a generated noise pattern, not a photograph), aiming for
-   the same neon-portrait mood as the reference without reproducing
-   anyone else's actual photographic artwork. A holographic sheen
+/* physical loyalty card face, credit-card proportions. Background is
+   the client's own branded scene artwork, scaled to fit inside the
+   card rather than cropped, sat over a dark gradient fill so any
+   letterboxed space still reads as intentional. A holographic sheen
    sweeps across it slowly on top, catching the light the way a real
    card would if you tilted it. */
 .watag-loyalty-card {
@@ -222,8 +221,8 @@ a {
   border-radius: 18px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 75% 65% at 28% 18%, rgba(255, 45, 149, 0.38), transparent 62%),
-    radial-gradient(ellipse 85% 75% at 78% 85%, rgba(0, 140, 255, 0.32), transparent 68%),
+    linear-gradient(180deg, rgba(10, 4, 16, 0.55), rgba(10, 4, 16, 0.65)),
+    url("/backgrounds/scene.webp") center / contain no-repeat,
     linear-gradient(160deg, #12061c 0%, #2b0f2a 50%, #0f0817 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
