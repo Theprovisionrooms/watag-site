@@ -246,9 +246,11 @@ Went with an original moody radial-glow-plus-grain treatment first, avoiding the
 
 ## animated app background
 
-Went through two other approaches first (the client's branded scene artwork as a static backdrop, then a canvas-drawn moving grid) before landing here: a looping background video (`public/backgrounds/loop.mp4`), fixed behind every screen, muted and autoplaying continuously. Re-encoded down from the original 3.7MB to about 1MB, no audio track (not needed for a background element), `faststart` so it can begin playing before the whole file's downloaded.
+Went through two other approaches first (the client's branded scene artwork as a static backdrop, then a canvas-drawn moving grid) before landing here: a looping background video (`public/backgrounds/loop.mp4`), fixed behind every screen, muted and autoplaying continuously. Re-encoded down from the original 3.7MB to about 2MB, no audio track (not needed for a background element), `faststart` so it can begin playing before the whole file's downloaded. Went through a couple of compression passes to get here, the first attempt was compressed too hard and looked visibly soft on a phone screen, this one keeps native resolution with much lighter compression.
 
 **Autoplay specifics worth knowing:** `muted` and `playsInline` are both required for this to autoplay on mobile Safari and Chrome, no exceptions, browsers block autoplay with sound entirely regardless of any other setting, that's not something to work around, it's a hard platform rule. Under `prefers-reduced-motion`, the video is explicitly paused via JS rather than just visually hidden, so a device with motion turned down isn't left silently decoding video in the background for no visible reason.
+
+**iOS's own "tap to play" button**, the thing that made the background look unfinished on first load, is a distinct WebKit overlay that shows on any video it declines to autoplay, separate from the `controls` attribute entirely. Hidden explicitly via `::-webkit-media-controls-start-playback-button` and related pseudo-elements in `global.css`. On top of that, `SynthwaveBackground.jsx` calls `.play()` directly on mount and retries once on the very first tap anywhere on the page as a fallback, since a real user gesture always unlocks playback if the browser blocked it initially.
 
 `public/backgrounds/scene.webp` (the branded artwork from the second background attempt) ended up finding a home after all, it's now the loyalty card's own background, see "loyalty card background" below.
 

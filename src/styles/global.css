@@ -126,6 +126,20 @@ a {
   height: auto;
   transform: translate(-50%, -50%);
   object-fit: cover;
+  pointer-events: none;
+}
+
+/* Safari's own big "tap to play" overlay, shown on any video it
+   declines to autoplay, this is what was making the background look
+   unprofessional, not something the controls attribute governs, it's
+   a distinct webkit pseudo-element that needs hiding explicitly */
+.watag-bg-video::-webkit-media-controls,
+.watag-bg-video::-webkit-media-controls-start-playback-button,
+.watag-bg-video::-webkit-media-controls-play-button,
+.watag-bg-video::-webkit-media-controls-panel {
+  display: none !important;
+  -webkit-appearance: none;
+  opacity: 0 !important;
 }
 
 .watag-bg-video-overlay {
