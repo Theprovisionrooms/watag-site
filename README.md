@@ -37,7 +37,7 @@ Every feature from the original brief is live, plus everything agreed along the 
 | Push notifications | bell tile, both home screens | Stamp/reward, referral bonus, new enquiry message, waitlist match, hand-rolled Web Push (no Node dependency) |
 | Waitlist | `/waitlist`, `/staff/waitlist` | Real approve/decline workflow, locked to the specific artist requested if one was picked, push notification either way |
 | Aftercare guide | `/aftercare` | Generic, standard tattoo aftercare information |
-| Visual system | site-wide | Animated brand scene background (client's own artwork), physical loyalty card with grain texture, transparent rabbit hero with intro glitch and idle float, staggered tile entrance, enlarged icon tap targets |
+| Visual system | site-wide | Looping background video, physical loyalty card with grain texture, transparent rabbit hero with intro glitch and idle float, staggered tile entrance, enlarged icon tap targets |
 | Install | site-wide | Custom install banner (Android) / instructions (iOS), PWA icons, manifest |
 
 Dropped from the plan on purpose: an aftercare guide page, decided not worth building.
@@ -244,9 +244,13 @@ Removed the small amber "eyebrow" label from every screen where it was just rest
 
 The card's background is now a moody magenta-to-blue radial glow with a procedural film-grain texture, aiming for the same neon-portrait mood as the reference image without reproducing it directly. Worth being upfront about why: that reference looked like a stock wallpaper pulled from a wallpaper aggregator site, not something WATAG has commercial rights to, so it isn't embedded in the app. If there's a photo Jay actually owns or holds a licence for, happy to swap it in properly, just needs confirming.
 
-## animated app background, this session
+## animated app background
 
-The synthwave canvas grid is gone, replaced with the client's own commissioned scene artwork (`public/backgrounds/scene.webp`, converted from the original PNG, 2.3MB down to about 160KB so it doesn't weigh down every page load) as the fixed backdrop behind every screen. It has "WATAG" and the mascot baked directly into the artwork, clearly a real brand asset rather than stock material, so no concern using it as-is. It has a slow, continuous drift and zoom rather than sitting static, and a dark gradient overlay keeps foreground text legible against its brighter centre. Turns static (no animation) under `prefers-reduced-motion`, same as everything else.
+Went through two other approaches first (the client's branded scene artwork as a static backdrop, then a canvas-drawn moving grid) before landing here: a looping background video (`public/backgrounds/loop.mp4`), fixed behind every screen, muted and autoplaying continuously. Re-encoded down from the original 3.7MB to about 1MB, no audio track (not needed for a background element), `faststart` so it can begin playing before the whole file's downloaded.
+
+**Autoplay specifics worth knowing:** `muted` and `playsInline` are both required for this to autoplay on mobile Safari and Chrome, no exceptions, browsers block autoplay with sound entirely regardless of any other setting, that's not something to work around, it's a hard platform rule. Under `prefers-reduced-motion`, the video is explicitly paused via JS rather than just visually hidden, so a device with motion turned down isn't left silently decoding video in the background for no visible reason.
+
+`public/backgrounds/scene.webp` (the branded artwork from the second attempt) is still sitting in the repo unused, in case it's handy later for something like a splash screen or a shop banner, safe to delete if it's never needed.
 
 ## a little more flair, this session
 
