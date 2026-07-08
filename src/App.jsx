@@ -12,6 +12,8 @@ import Artists from "./pages/Artists.jsx";
 import ArtistGallery from "./pages/ArtistGallery.jsx";
 import Referrals from "./pages/Referrals.jsx";
 import Aftercare from "./pages/Aftercare.jsx";
+import Studio from "./pages/Studio.jsx";
+import StaffLegal from "./pages/StaffLegal.jsx";
 import ReferralLanding from "./pages/ReferralLanding.jsx";
 import Shop from "./pages/Shop.jsx";
 import ShopSuccess from "./pages/ShopSuccess.jsx";
@@ -52,6 +54,7 @@ export default function App() {
         <Route path="/artists/:staffId/gallery" element={<ArtistGallery />} />
         <Route path="/referrals" element={<Referrals />} />
         <Route path="/aftercare" element={<Aftercare />} />
+        <Route path="/studio" element={<Studio />} />
         <Route path="/r/:code" element={<ReferralLanding />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/shop/success" element={<ShopSuccess />} />
@@ -66,6 +69,7 @@ export default function App() {
         <Route path="/staff/products" element={<StaffProducts />} />
         <Route path="/staff/waitlist" element={<StaffWaitlist />} />
         <Route path="/staff/stats" element={<StaffStats />} />
+        <Route path="/staff/legal" element={<StaffLegal />} />
       </Routes>
       <InstallPrompt />
     </>

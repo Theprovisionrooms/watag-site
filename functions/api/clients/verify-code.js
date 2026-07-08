@@ -54,6 +54,25 @@ export async function onRequestPost({ request, env }) {
         headers: { "content-type": "application/json" },
       });
     }
+
+    // same phone already tied to a different email, most likely someone
+    // signing up again on a throwaway address to farm another set of
+    // rewards. Point them back at the account that already exists rather
+    // than silently creating a second one.
+    const cleanPhone = phone.trim();
+    const phoneMatch = await env.WATAG_DB.prepare(`SELECT email FROM clients WHERE phone = ?`)
+      .bind(cleanPhone)
+      .first();
+    if (phoneMatch) {
+      return new Response(
+        JSON.stringify({
+          error: "phone_already_registered",
+          detail: "That phone number is already on an account, sign in with the original email instead.",
+        }),
+        { status: 409, headers: { "content-type": "application/json" } }
+      );
+    }
+
     const result = await env.WATAG_DB.prepare(`INSERT INTO clients (name, email, phone) VALUES (?, ?, ?)`)
       .bind(name.trim(), cleanEmail, phone.trim())
       .run();

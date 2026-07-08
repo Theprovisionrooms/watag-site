@@ -13,9 +13,17 @@ import { NavBack } from "../App.jsx";
 const TOKEN_TTL = 60;
 const TIERS = [
   { count: 3, label: "small tattoo" },
-  { count: 6, label: "session credit" },
-  { count: 9, label: "merch" },
+  { count: 6, label: "watag hoodie" },
+  { count: 9, label: "£100 credit" },
 ];
+
+// keys match what the backend sends back as pendingReward, this is
+// just the human-readable version for the banner up top
+const REWARD_LABELS = {
+  small_tattoo: "small tattoo",
+  watag_hoodie: "WATAG hoodie",
+  in_store_credit: "£100 in-store credit",
+};
 
 function useSession() {
   const [session, setSession] = useState(() => ({
@@ -81,7 +89,13 @@ function ProfileEntry({ onVerified }) {
     setSubmitting(false);
     localStorage.removeItem("watag_referral_code");
     if (!res.ok) {
-      setError(data.error === "invalid_or_expired_code" ? "wrong code, check your email and try again" : data.error || "something went wrong");
+      if (data.error === "invalid_or_expired_code") {
+        setError("wrong code, check your email and try again");
+      } else if (data.error === "phone_already_registered") {
+        setError("that phone number is already on an account, sign in with the original email instead");
+      } else {
+        setError(data.detail || data.error || "something went wrong");
+      }
       return;
     }
     onVerified(data.token, data.name);
@@ -240,12 +254,14 @@ export default function ClientLoyaltyCard() {
         <div className="watag-card" style={{ borderColor: "var(--watag-amber)" }}>
           <strong style={{ color: "var(--watag-amber)" }}>Reward ready</strong>
           <p style={{ margin: "4px 0 0", color: "var(--watag-text-dim)" }}>
-            Show this screen in studio to redeem your {pendingReward.replace("_", " ")}.
+            Show this screen in studio to redeem your {REWARD_LABELS[pendingReward] || pendingReward.replace(/_/g, " ")}.
           </p>
         </div>
       )}
 
       <div className="watag-loyalty-card">
+        <img src="/icons/wordmark-brush.png" alt="" className="watag-loyalty-card-mark" />
+
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1 }}>
           <img src="/icons/rabbit-hero.png" alt="" style={{ width: 34, height: "auto" }} />
           <span style={{ fontSize: 10, letterSpacing: "0.14em", color: "var(--watag-text-dim)", textTransform: "uppercase" }}>

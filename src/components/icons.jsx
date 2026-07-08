@@ -162,6 +162,16 @@ export function CameraIcon() {
   );
 }
 
+export function LegalIcon() {
+  return (
+    <svg {...base}>
+      <path d="M12 5h16l6 6v26a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
+      <path d="M28 5v6h6" />
+      <path d="M15 22h18M15 28h18M15 34h11" />
+    </svg>
+  );
+}
+
 export function AftercareIcon() {
   return (
     <svg {...base}>

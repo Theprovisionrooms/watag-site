@@ -33,7 +33,7 @@ export async function onRequestGet({ request, env }) {
       stampCount: card.stamp_count,
       pendingReward: card.pending_reward,
       lastStampedAt: card.last_stamped_at,
-      tiers: { 3: "small_tattoo", 6: "session_credit", 9: "merch" },
+      tiers: { 3: "small_tattoo", 6: "watag_hoodie", 9: "in_store_credit" },
     }),
     { headers: { "content-type": "application/json" } }
   );

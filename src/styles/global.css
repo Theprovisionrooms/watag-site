@@ -234,16 +234,28 @@ a {
   aspect-ratio: 1.586 / 1;
   border-radius: 18px;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(10, 4, 16, 0.55), rgba(10, 4, 16, 0.65)),
-    url("/backgrounds/scene.webp") center / contain no-repeat,
-    linear-gradient(160deg, #12061c 0%, #2b0f2a 50%, #0f0817 100%);
+  background: linear-gradient(135deg, #1a0b24 0%, #3a1030 45%, #1a0b24 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+/* brush wordmark sat centred in the card, well behind the stamp grid
+   and name/count row so it never competes with the actual card data */
+.watag-loyalty-card-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 62%;
+  max-width: 240px;
+  height: auto;
+  opacity: 0.16;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .watag-loyalty-card::after {
