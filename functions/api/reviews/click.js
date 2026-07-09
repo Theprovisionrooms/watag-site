@@ -6,7 +6,7 @@
 // the real Google review page. Swap GOOGLE_REVIEW_URL once Jay's real
 // Google Business Profile link is in hand.
 
-const GOOGLE_REVIEW_URL = "https://g.page/r/REPLACE_WITH_REAL_LINK/review";
+const GOOGLE_REVIEW_URL = "https://g.page/r/CYEZZgWtNcfBEAE/review";
 
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);

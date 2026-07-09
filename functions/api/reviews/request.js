@@ -11,7 +11,7 @@
 
 import { resolveStaffSession } from "../../_lib/session.js";
 
-const GOOGLE_REVIEW_URL = "https://g.page/r/REPLACE_WITH_REAL_LINK/review";
+const GOOGLE_REVIEW_URL = "https://g.page/r/CYEZZgWtNcfBEAE/review";
 const RESEND_FROM = "WATAG <onboarding@resend.dev>"; // swap once a real domain is verified in Resend
 
 export async function onRequestPost({ request, env }) {
