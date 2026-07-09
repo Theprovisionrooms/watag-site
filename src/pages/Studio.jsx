@@ -3,12 +3,12 @@
 //
 // Public gallery showing the inside of the studio. Deliberately not
 // tied to the staff upload system, this is just a fixed set of shots
-// Jay drops into /public/studio and lists below, no backend needed.
+// Jay drops into /public/studio and lists below, no ackend needed.
 
 import { NavBack } from "../App.jsx";
 
 // add a filename here for each photo dropped into /public/studio
-const STUDIO_IMAGES = ["image-1.JPG","image-2.JPG","image-3.JPG","image-4.JPG","image-5.JPG","image-6.JPG"
+const STUDIO_IMAGES = ["image-1.jpg","image-2.jpg","image-3.jpg","image-4.jpg","image-5.jpg","image-6.jpg"
   // "chair-1.jpg",
   // "front-desk.jpg",
   // "wall-flash.jpg",
