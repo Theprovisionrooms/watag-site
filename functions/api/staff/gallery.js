@@ -1,9 +1,11 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 //
-// GET    /api/staff/gallery?staffId=1        list a staff member's gallery
-// POST   /api/staff/gallery                  upload a new image, multipart form: staffId, file, caption (optional)
-// DELETE /api/staff/gallery                  body: { imageId }, removes the row and the R2 object
+// GET    /api/staff/gallery?staffId=1        public, list a staff member's gallery
+// POST   /api/staff/gallery   Header: Authorization: Bearer <token>   multipart form: file, caption (optional)
+// DELETE /api/staff/gallery   Header: Authorization: Bearer <token>   body: { imageId }, own images or owner role only
+
+import { resolveStaffSession, isOwner } from "../../_lib/session.js";
 
 function safeFilename(name) {
   return name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
@@ -33,13 +35,21 @@ export async function onRequestGet({ request, env }) {
 }
 
 export async function onRequestPost({ request, env }) {
+  const sessionStaffId = await resolveStaffSession(request, env);
+  if (!sessionStaffId) {
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
   const formData = await request.formData();
-  const staffId = formData.get("staffId");
+  const staffId = sessionStaffId;
   const caption = formData.get("caption") || null;
   const file = formData.get("file");
 
-  if (!staffId || !file) {
-    return new Response(JSON.stringify({ error: "staffId and file required" }), {
+  if (!file) {
+    return new Response(JSON.stringify({ error: "file required" }), {
       status: 400,
       headers: { "content-type": "application/json" },
     });
@@ -63,6 +73,14 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestDelete({ request, env }) {
+  const sessionStaffId = await resolveStaffSession(request, env);
+  if (!sessionStaffId) {
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
   const { imageId } = await request.json();
 
   if (!imageId) {
@@ -72,14 +90,22 @@ export async function onRequestDelete({ request, env }) {
     });
   }
 
-  const row = await env.WATAG_DB.prepare(`SELECT image_url FROM staff_gallery WHERE id = ?`)
+  const row = await env.WATAG_DB.prepare(`SELECT staff_id, image_url FROM staff_gallery WHERE id = ?`)
     .bind(imageId)
     .first();
 
-  if (row) {
-    await env.WATAG_MEDIA.delete(row.image_url);
+  if (!row) {
+    return new Response(JSON.stringify({ deleted: true }), { headers: { "content-type": "application/json" } });
   }
 
+  if (row.staff_id !== sessionStaffId && !(await isOwner(env, sessionStaffId))) {
+    return new Response(JSON.stringify({ error: "not_your_image" }), {
+      status: 403,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
+  await env.WATAG_MEDIA.delete(row.image_url);
   await env.WATAG_DB.prepare(`DELETE FROM staff_gallery WHERE id = ?`).bind(imageId).run();
 
   return new Response(JSON.stringify({ deleted: true }), {

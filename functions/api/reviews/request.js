@@ -2,20 +2,31 @@
 // Intellectual property of Sidedoor Digital
 //
 // POST /api/reviews/request
-// Body: { staffId, clientId }
+// Header: Authorization: Bearer <staff session token>
+// Body: { clientId }
 // Sends an email asking for a Google review, with a link that goes
 // through our own redirect first so we know if it was actually clicked.
 // Needs GOOGLE_REVIEW_URL swapped for Jay's real Google Business Profile
 // review link, currently a placeholder.
 
+import { resolveStaffSession } from "../../_lib/session.js";
+
 const GOOGLE_REVIEW_URL = "https://g.page/r/REPLACE_WITH_REAL_LINK/review";
 const RESEND_FROM = "WATAG <onboarding@resend.dev>"; // swap once a real domain is verified in Resend
 
 export async function onRequestPost({ request, env }) {
-  const { staffId, clientId } = await request.json();
+  const staffId = await resolveStaffSession(request, env);
+  if (!staffId) {
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
+  }
 
-  if (!staffId || !clientId) {
-    return new Response(JSON.stringify({ error: "staffId and clientId are required" }), {
+  const { clientId } = await request.json();
+
+  if (!clientId) {
+    return new Response(JSON.stringify({ error: "clientId is required" }), {
       status: 400,
       headers: { "content-type": "application/json" },
     });

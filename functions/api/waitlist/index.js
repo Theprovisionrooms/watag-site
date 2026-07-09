@@ -1,18 +1,18 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 //
-// POST   /api/waitlist   Header: Authorization: Bearer <session token>   body: { staffId (optional), requestedDate, notes }
-// GET    /api/waitlist   ?staffId=1              artist view: entries for them specifically, plus anyone happy with any artist
-// GET    /api/waitlist   Authorization header     client view: that client's own requests and their current status
-// PATCH  /api/waitlist   body: { id, action: "approve" | "decline" }  (+ staffId for staff)
-// DELETE /api/waitlist   body: { id }   clears an entry entirely, once it's been actioned and booked in
+// POST   /api/waitlist   Header: Authorization: Bearer <client session token>   body: { staffId (optional), requestedDate, notes }
+// GET    /api/waitlist   Header: Authorization: Bearer <staff session token>    artist view: entries for them specifically, plus anyone happy with any artist
+// GET    /api/waitlist   Header: Authorization: Bearer <client session token>   client view: that client's own requests and their current status
+// PATCH  /api/waitlist   Header: Authorization: Bearer <staff session token>    body: { id, action: "approve" | "decline" }
+// DELETE /api/waitlist   Header: Authorization: Bearer <staff session token>    body: { id }   clears an entry entirely, once it's been actioned and booked in
 //
 // A request tied to a specific artist can only be approved or declined
 // by that artist. A request left open to "any artist" can be actioned
 // by whichever artist gets there first, and that locks staff_id to
 // them so it's clear afterwards who actually picked it up.
 
-import { resolveClientSession } from "../../_lib/session.js";
+import { resolveClientSession, resolveStaffSession } from "../../_lib/session.js";
 import { notifyOwner } from "../../_lib/webpush.js";
 
 export async function onRequestPost({ request, env }) {
@@ -44,8 +44,7 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestGet({ request, env }) {
-  const url = new URL(request.url);
-  const staffId = url.searchParams.get("staffId");
+  const staffId = await resolveStaffSession(request, env);
 
   if (staffId) {
     const rows = await env.WATAG_DB.prepare(
@@ -80,10 +79,18 @@ export async function onRequestGet({ request, env }) {
 }
 
 export async function onRequestPatch({ request, env }) {
-  const { id, action, staffId } = await request.json();
+  const staffId = await resolveStaffSession(request, env);
+  if (!staffId) {
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
+  }
 
-  if (!id || !["approve", "decline"].includes(action) || !staffId) {
-    return new Response(JSON.stringify({ error: "id, a valid action, and staffId are required" }), {
+  const { id, action } = await request.json();
+
+  if (!id || !["approve", "decline"].includes(action)) {
+    return new Response(JSON.stringify({ error: "id and a valid action are required" }), {
       status: 400,
       headers: { "content-type": "application/json" },
     });
@@ -94,7 +101,7 @@ export async function onRequestPatch({ request, env }) {
     return new Response(JSON.stringify({ error: "not_found" }), { status: 404, headers: { "content-type": "application/json" } });
   }
 
-  if (entry.staff_id && entry.staff_id !== Number(staffId)) {
+  if (entry.staff_id && entry.staff_id !== staffId) {
     return new Response(JSON.stringify({ error: "requested_a_different_artist" }), {
       status: 403,
       headers: { "content-type": "application/json" },
@@ -104,7 +111,7 @@ export async function onRequestPatch({ request, env }) {
   const newStatus = action === "approve" ? "approved" : "declined";
 
   await env.WATAG_DB.prepare(`UPDATE waitlist SET status = ?, staff_id = ? WHERE id = ?`)
-    .bind(newStatus, entry.staff_id || Number(staffId), id)
+    .bind(newStatus, entry.staff_id || staffId, id)
     .run();
 
   await notifyOwner(env, "client", entry.client_id, {
@@ -120,6 +127,14 @@ export async function onRequestPatch({ request, env }) {
 }
 
 export async function onRequestDelete({ request, env }) {
+  const staffId = await resolveStaffSession(request, env);
+  if (!staffId) {
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
   const { id } = await request.json();
   if (!id) {
     return new Response(JSON.stringify({ error: "id required" }), {

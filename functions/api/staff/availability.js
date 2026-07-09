@@ -2,17 +2,18 @@
 // Intellectual property of Sidedoor Digital
 //
 // GET  /api/staff/availability?staffId=1&from=2026-06-23&to=2026-06-29
-//      Returns availability blocks for a staff member over a date range,
-//      used to render the colour coded calendar.
+//      Public, used by the client-facing calendar too. Returns
+//      availability blocks for a staff member over a date range.
 //
-// POST /api/staff/availability
-//      Body: { staffId, date, startTime, endTime, status }
+// POST /api/staff/availability   Header: Authorization: Bearer <staff session token>
+//      Body: { date, startTime, endTime, status }
 //      A staff member sets or updates their own availability block.
 //      If the slot's status is "available" and someone's on the
 //      waitlist for that date (with this artist specifically, or
 //      happy with any artist), they get pinged.
 
 import { notifyOwner } from "../../_lib/webpush.js";
+import { resolveStaffSession, isOwner } from "../../_lib/session.js";
 
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
@@ -43,10 +44,19 @@ export async function onRequestGet({ request, env }) {
 }
 
 export async function onRequestPost({ request, env }) {
-  const { staffId, date, startTime, endTime, status, notes } = await request.json();
+  const sessionStaffId = await resolveStaffSession(request, env);
+  if (!sessionStaffId) {
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
+  }
 
-  if (!staffId || !date || !startTime || !endTime) {
-    return new Response(JSON.stringify({ error: "staffId, date, startTime and endTime are required" }), {
+  const { date, startTime, endTime, status, notes } = await request.json();
+  const staffId = sessionStaffId;
+
+  if (!date || !startTime || !endTime) {
+    return new Response(JSON.stringify({ error: "date, startTime and endTime are required" }), {
       status: 400,
       headers: { "content-type": "application/json" },
     });
@@ -83,11 +93,30 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestDelete({ request, env }) {
+  const sessionStaffId = await resolveStaffSession(request, env);
+  if (!sessionStaffId) {
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
   const { id } = await request.json();
 
   if (!id) {
     return new Response(JSON.stringify({ error: "id required" }), {
       status: 400,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
+  const slot = await env.WATAG_DB.prepare(`SELECT staff_id FROM staff_availability WHERE id = ?`).bind(id).first();
+  if (!slot) {
+    return new Response(JSON.stringify({ deleted: true }), { headers: { "content-type": "application/json" } });
+  }
+  if (slot.staff_id !== sessionStaffId && !(await isOwner(env, sessionStaffId))) {
+    return new Response(JSON.stringify({ error: "not_your_slot" }), {
+      status: 403,
       headers: { "content-type": "application/json" },
     });
   }

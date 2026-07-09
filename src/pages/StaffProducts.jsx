@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavBack } from "../App.jsx";
+import { staffAuthHeaders } from "../utils/staffAuth.js";
 
 export default function StaffProducts() {
   const navigate = useNavigate();
@@ -19,8 +20,9 @@ export default function StaffProducts() {
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
+    const token = localStorage.getItem("watag_staff_token");
     const role = localStorage.getItem("watag_staff_role");
-    if (!id) {
+    if (!id || !token) {
       navigate("/staff");
       return;
     }
@@ -42,14 +44,13 @@ export default function StaffProducts() {
     if (!form.name || !form.price) return;
     setSaving(true);
     const formData = new FormData();
-    formData.append("staffId", staffId);
     formData.append("name", form.name);
     formData.append("description", form.description);
     formData.append("price", form.price);
     formData.append("loyaltyEligible", String(form.loyaltyEligible));
     if (fileInput.current.files[0]) formData.append("image", fileInput.current.files[0]);
 
-    await fetch("/api/staff/products", { method: "POST", body: formData });
+    await fetch("/api/staff/products", { method: "POST", headers: staffAuthHeaders(), body: formData });
     setForm({ name: "", description: "", price: "", loyaltyEligible: false });
     fileInput.current.value = "";
     setSaving(false);
@@ -59,8 +60,8 @@ export default function StaffProducts() {
   async function deactivate(id) {
     await fetch("/api/staff/products", {
       method: "DELETE",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ staffId, productId: id }),
+      headers: { "content-type": "application/json", ...staffAuthHeaders() },
+      body: JSON.stringify({ productId: id }),
     });
     load();
   }

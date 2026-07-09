@@ -1,9 +1,9 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 //
-// GET    /api/enquiries/messages?threadId=1          (+ staffId=1 for staff, Authorization header for clients)
+// GET    /api/enquiries/messages?threadId=1          Authorization header, client or staff session
 // POST   /api/enquiries/messages  { threadId, body, photoUrl }   text, a photo, or both, at least one required
-// DELETE /api/enquiries/messages  { messageId }       (+ staffId for staff, Authorization header for clients)
+// DELETE /api/enquiries/messages  { messageId }       Authorization header, client or staff session
 //
 // Delete is allowed for whoever sent the message, or for the artist in
 // the thread regardless of who sent it (moderation, and the main way

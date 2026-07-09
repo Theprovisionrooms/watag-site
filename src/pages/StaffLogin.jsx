@@ -29,11 +29,19 @@ export default function StaffLogin() {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ staffId: selected.id, pin }),
     });
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError("wrong pin, try again");
+      if (data.error === "locked") {
+        const mins = Math.ceil((data.retryAfterSeconds || 900) / 60);
+        setError(`too many wrong PINs, locked for ${mins} minutes`);
+      } else if (typeof data.attemptsRemaining === "number") {
+        setError(`wrong pin, ${data.attemptsRemaining} ${data.attemptsRemaining === 1 ? "try" : "tries"} left before lockout`);
+      } else {
+        setError("wrong pin, try again");
+      }
       return;
     }
-    const data = await res.json();
+    localStorage.setItem("watag_staff_token", data.token);
     localStorage.setItem("watag_staff_id", data.staffId);
     localStorage.setItem("watag_staff_name", data.name);
     localStorage.setItem("watag_staff_color", data.calendarColor);

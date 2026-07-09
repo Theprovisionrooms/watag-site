@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import jsQR from "jsqr";
 import { NavBack } from "../App.jsx";
+import { staffAuthHeaders } from "../utils/staffAuth.js";
 
 export default function StaffScan() {
   const videoRef = useRef(null);
@@ -24,7 +25,8 @@ export default function StaffScan() {
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
-    if (!id) {
+    const token = localStorage.getItem("watag_staff_token");
+    if (!id || !token) {
       navigate("/staff");
       return;
     }
@@ -79,8 +81,8 @@ export default function StaffScan() {
 
     const res = await fetch("/api/loyalty/scan", {
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ token, staffId }),
+      headers: { "content-type": "application/json", ...staffAuthHeaders() },
+      body: JSON.stringify({ token }),
     });
     const data = await res.json();
 
@@ -97,7 +99,7 @@ export default function StaffScan() {
       setStatus("success");
       setStampedClientId(data.clientId);
       const base = data.pendingReward
-        ? `stamp ${data.stampCount}/9, reward ready: ${data.pendingReward.replace("_", " ")}`
+        ? `stamp ${data.stampCount}/9, reward ready: ${data.pendingReward.replace(/_/g, " ")}`
         : `stamp ${data.stampCount}/9`;
       setMessage(data.referralCompleted ? `${base} · this was a referral, the referrer just got a bonus stamp` : base);
     }
@@ -107,8 +109,8 @@ export default function StaffScan() {
     setReviewState("sending");
     await fetch("/api/reviews/request", {
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ staffId, clientId: stampedClientId }),
+      headers: { "content-type": "application/json", ...staffAuthHeaders() },
+      body: JSON.stringify({ clientId: stampedClientId }),
     });
     setReviewState("sent");
   }

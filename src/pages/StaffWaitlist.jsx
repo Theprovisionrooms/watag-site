@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavBack } from "../App.jsx";
+import { staffAuthHeaders } from "../utils/staffAuth.js";
 
 const STATUS_COLOR = { pending: "var(--watag-amber)", approved: "var(--watag-cyan)", declined: "var(--watag-text-dim)" };
 
@@ -19,16 +20,17 @@ export default function StaffWaitlist() {
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
-    if (!id) {
+    const token = localStorage.getItem("watag_staff_token");
+    if (!id || !token) {
       navigate("/staff");
       return;
     }
     setStaffId(id);
-    load(id);
+    load();
   }, [navigate]);
 
-  function load(id) {
-    fetch(`/api/waitlist?staffId=${id}`)
+  function load() {
+    fetch(`/api/waitlist`, { headers: staffAuthHeaders() })
       .then((res) => res.json())
       .then(setEntries);
   }
@@ -37,20 +39,20 @@ export default function StaffWaitlist() {
     setActing(id);
     await fetch("/api/waitlist", {
       method: "PATCH",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ id, action, staffId }),
+      headers: { "content-type": "application/json", ...staffAuthHeaders() },
+      body: JSON.stringify({ id, action }),
     });
     setActing(null);
-    load(staffId);
+    load();
   }
 
   async function clear(id) {
     await fetch("/api/waitlist", {
       method: "DELETE",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...staffAuthHeaders() },
       body: JSON.stringify({ id }),
     });
-    load(staffId);
+    load();
   }
 
   return (

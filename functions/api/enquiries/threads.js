@@ -2,8 +2,7 @@
 // Intellectual property of Sidedoor Digital
 //
 // GET /api/enquiries/threads
-// Client view: Authorization: Bearer <session token>
-// Staff view:  ?staffId=1
+// Header: Authorization: Bearer <session token>, either a client or staff one
 // Returns each thread with the other party's name, a preview of the
 // last message, and an unread count for messages not sent by the viewer.
 

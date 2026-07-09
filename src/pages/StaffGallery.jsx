@@ -7,6 +7,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavBack } from "../App.jsx";
+import { staffAuthHeaders } from "../utils/staffAuth.js";
 
 export default function StaffGallery() {
   const navigate = useNavigate();
@@ -17,7 +18,8 @@ export default function StaffGallery() {
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
-    if (!id) {
+    const token = localStorage.getItem("watag_staff_token");
+    if (!id || !token) {
       navigate("/staff");
       return;
     }
@@ -35,9 +37,8 @@ export default function StaffGallery() {
     if (!file) return;
     setUploading(true);
     const formData = new FormData();
-    formData.append("staffId", staffId);
     formData.append("file", file);
-    await fetch("/api/staff/gallery", { method: "POST", body: formData });
+    await fetch("/api/staff/gallery", { method: "POST", headers: staffAuthHeaders(), body: formData });
     fileInput.current.value = "";
     setUploading(false);
     loadImages(staffId);
@@ -46,7 +47,7 @@ export default function StaffGallery() {
   async function handleDelete(imageId) {
     await fetch("/api/staff/gallery", {
       method: "DELETE",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...staffAuthHeaders() },
       body: JSON.stringify({ imageId }),
     });
     loadImages(staffId);

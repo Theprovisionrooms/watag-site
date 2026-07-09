@@ -2,17 +2,17 @@
 // Intellectual property of Sidedoor Digital
 //
 // POST /api/push/subscribe
-// Body: { staffId, subscription }  (staff side)
-// Header: Authorization: Bearer <session token>, body: { subscription }  (client side)
+// Header: Authorization: Bearer <session token>, either a client or staff one
+// Body: { subscription }
 //
 // `subscription` is the raw object the browser's PushManager.subscribe()
 // returns (endpoint + keys.p256dh + keys.auth).
 
-import { resolveClientSession } from "../../_lib/session.js";
+import { resolveClientSession, resolveStaffSession } from "../../_lib/session.js";
 
 export async function onRequestPost({ request, env }) {
   const body = await request.json();
-  const { staffId, subscription } = body;
+  const { subscription } = body;
 
   if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
     return new Response(JSON.stringify({ error: "valid subscription required" }), {
@@ -26,14 +26,17 @@ export async function onRequestPost({ request, env }) {
   if (clientId) {
     ownerType = "client";
     ownerId = clientId;
-  } else if (staffId) {
-    ownerType = "staff";
-    ownerId = Number(staffId);
   } else {
-    return new Response(JSON.stringify({ error: "not_signed_in" }), {
-      status: 401,
-      headers: { "content-type": "application/json" },
-    });
+    const staffId = await resolveStaffSession(request, env);
+    if (staffId) {
+      ownerType = "staff";
+      ownerId = staffId;
+    } else {
+      return new Response(JSON.stringify({ error: "not_signed_in" }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
+    }
   }
 
   await env.WATAG_DB.prepare(

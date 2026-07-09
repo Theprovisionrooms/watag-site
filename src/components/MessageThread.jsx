@@ -3,7 +3,9 @@
 //
 // Shared message thread UI. Feels instant on the phone, messages land
 // within a few seconds, but it's a poll under the hood, not a socket.
-// identity is { type: "client", token } or { type: "staff", staffId }.
+// identity is { type: "client", token } or { type: "staff", staffId, token }.
+// token is always a real session token now, staffId on the staff side
+// is just used for the "is this message mine" check in the UI.
 //
 // Photos are resized and compressed in the browser before upload (see
 // utils/resizeImage.js), that's the main cost control, on top of that
@@ -16,19 +18,13 @@ import { NavBack } from "../App.jsx";
 import { resizeImageForUpload } from "../utils/resizeImage.js";
 import { CameraIcon } from "./icons.jsx";
 
-function getUrl(threadId, identity) {
-  let url = `/api/enquiries/messages?threadId=${threadId}`;
-  if (identity.type === "staff") url += `&staffId=${identity.staffId}`;
-  return url;
-}
-
 function getHeaders(identity) {
-  return identity.type === "client" ? { Authorization: `Bearer ${identity.token}` } : {};
+  return identity.token ? { Authorization: `Bearer ${identity.token}` } : {};
 }
 
 function postHeaders(identity) {
   const headers = { "content-type": "application/json" };
-  if (identity.type === "client") headers.Authorization = `Bearer ${identity.token}`;
+  if (identity.token) headers.Authorization = `Bearer ${identity.token}`;
   return headers;
 }
 
@@ -41,7 +37,7 @@ export default function MessageThread({ threadId, identity, otherName, subtitle,
   const fileInput = useRef(null);
 
   async function load() {
-    const res = await fetch(getUrl(threadId, identity), { headers: getHeaders(identity) });
+    const res = await fetch(`/api/enquiries/messages?threadId=${threadId}`, { headers: getHeaders(identity) });
     if (res.ok) setMessages(await res.json());
   }
 
@@ -60,7 +56,6 @@ export default function MessageThread({ threadId, identity, otherName, subtitle,
     if (!draft.trim() && !photoUrl) return;
     setSending(true);
     const payload = { threadId, body: draft, photoUrl };
-    if (identity.type === "staff") payload.staffId = identity.staffId;
     await fetch("/api/enquiries/messages", {
       method: "POST",
       headers: postHeaders(identity),
@@ -82,11 +77,9 @@ export default function MessageThread({ threadId, identity, otherName, subtitle,
 
       const formData = new FormData();
       formData.append("threadId", threadId);
-      if (identity.type === "staff") formData.append("staffId", identity.staffId);
       formData.append("file", resized);
 
-      const uploadHeaders = identity.type === "client" ? { Authorization: `Bearer ${identity.token}` } : {};
-      const res = await fetch("/api/enquiries/upload-photo", { method: "POST", headers: uploadHeaders, body: formData });
+      const res = await fetch("/api/enquiries/upload-photo", { method: "POST", headers: getHeaders(identity), body: formData });
       const data = await res.json();
 
       if (res.ok) await send(data.photoUrl);
@@ -97,7 +90,6 @@ export default function MessageThread({ threadId, identity, otherName, subtitle,
 
   async function deleteMessage(messageId) {
     const payload = { messageId };
-    if (identity.type === "staff") payload.staffId = identity.staffId;
     await fetch("/api/enquiries/messages", {
       method: "DELETE",
       headers: postHeaders(identity),

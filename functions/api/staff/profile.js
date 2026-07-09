@@ -1,11 +1,13 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 //
-// GET  /api/staff/profile?staffId=1
-// POST /api/staff/profile   multipart: staffId, name, bio, calendarColor, photo (optional file)
+// GET  /api/staff/profile?staffId=1                                     public, feeds the client-facing artist directory
+// POST /api/staff/profile   Header: Authorization: Bearer <token>       multipart: name, bio, calendarColor, photo (optional file)
 //
 // An artist's own editable profile, this is what feeds the client
 // facing directory. Replaces the old colour-only settings endpoint.
+
+import { resolveStaffSession } from "../../_lib/session.js";
 
 function safeFilename(name) {
   return name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
@@ -34,8 +36,16 @@ export async function onRequestGet({ request, env }) {
 }
 
 export async function onRequestPost({ request, env }) {
+  const sessionStaffId = await resolveStaffSession(request, env);
+  if (!sessionStaffId) {
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
   const formData = await request.formData();
-  const staffId = formData.get("staffId");
+  const staffId = sessionStaffId;
   const name = formData.get("name");
   const bio = formData.get("bio") || "";
   const calendarColor = formData.get("calendarColor");

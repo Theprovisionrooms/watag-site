@@ -8,7 +8,7 @@
 // resizes and compresses the image in the browser before it ever
 // reaches here, this endpoint just stores whatever it's given.
 
-import { resolveClientSession } from "../../_lib/session.js";
+import { resolveClientSession, resolveStaffSession } from "../../_lib/session.js";
 import { authoriseThread } from "../../_lib/enquiries.js";
 
 function safeFilename(name) {
@@ -18,7 +18,6 @@ function safeFilename(name) {
 export async function onRequestPost({ request, env }) {
   const formData = await request.formData();
   const threadId = formData.get("threadId");
-  const staffId = formData.get("staffId");
   const file = formData.get("file");
 
   if (!threadId || !file) {
@@ -32,13 +31,16 @@ export async function onRequestPost({ request, env }) {
   const clientId = await resolveClientSession(request, env);
   if (clientId) {
     viewer = { type: "client", id: clientId };
-  } else if (staffId) {
-    viewer = { type: "staff", id: Number(staffId) };
   } else {
-    return new Response(JSON.stringify({ error: "not_signed_in" }), {
-      status: 401,
-      headers: { "content-type": "application/json" },
-    });
+    const staffId = await resolveStaffSession(request, env);
+    if (staffId) {
+      viewer = { type: "staff", id: staffId };
+    } else {
+      return new Response(JSON.stringify({ error: "not_signed_in" }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
+    }
   }
 
   const thread = await authoriseThread(env, threadId, viewer);

@@ -13,7 +13,6 @@ import {
   ChatIcon,
   ShopBagIcon,
   ChartIcon,
-  LegalIcon,
 } from "../components/icons.jsx";
 
 export default function StaffHome() {
@@ -25,7 +24,8 @@ export default function StaffHome() {
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
-    if (!id) {
+    const token = localStorage.getItem("watag_staff_token");
+    if (!id || !token) {
       navigate("/staff");
       return;
     }
@@ -57,11 +57,10 @@ export default function StaffHome() {
         <NavTile index={3} to="/staff/availability" icon={<ClockIcon />} label="My availability" />
         <NavTile index={4} to="/staff/messages" icon={<ChatIcon />} label="Enquiries" />
         <NavTile index={5} to="/staff/waitlist" icon={<ClockIcon />} label="Waitlist" />
-        <NavTile index={6} to="/staff/legal" icon={<LegalIcon />} label="Legal" />
         {role === "owner" && (
           <>
-            <NavTile index={7} to="/staff/products" icon={<ShopBagIcon />} label="Manage shop" />
-            <NavTile index={8} to="/staff/stats" icon={<ChartIcon />} label="Stats" />
+            <NavTile index={6} to="/staff/products" icon={<ShopBagIcon />} label="Manage shop" />
+            <NavTile index={7} to="/staff/stats" icon={<ChartIcon />} label="Stats" />
           </>
         )}
         {staffId && <NotificationToggle staffId={staffId} />}

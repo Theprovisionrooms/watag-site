@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavBack } from "../App.jsx";
+import { staffAuthHeaders } from "../utils/staffAuth.js";
 
 function StatBlock({ label, value, accent = "var(--watag-cyan)" }) {
   return (
@@ -23,8 +24,9 @@ export default function StaffStats() {
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
+    const token = localStorage.getItem("watag_staff_token");
     const role = localStorage.getItem("watag_staff_role");
-    if (!id) {
+    if (!id || !token) {
       navigate("/staff");
       return;
     }
@@ -32,7 +34,7 @@ export default function StaffStats() {
       navigate("/staff/home");
       return;
     }
-    fetch(`/api/staff/stats?staffId=${id}`)
+    fetch(`/api/staff/stats`, { headers: staffAuthHeaders() })
       .then((res) => res.json())
       .then(setStats);
   }, [navigate]);
@@ -90,7 +92,7 @@ export default function StaffStats() {
           <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 8 }}>
             {stats.loyalty.pendingRewards.map((r) => (
               <div key={r.pending_reward} style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                <span>{r.pending_reward.replace("_", " ")}</span>
+                <span>{r.pending_reward.replace(/_/g, " ")}</span>
                 <span style={{ color: "var(--watag-text-dim)" }}>{r.total}</span>
               </div>
             ))}

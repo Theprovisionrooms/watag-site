@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MessageThread from "../components/MessageThread.jsx";
+import { staffAuthHeaders } from "../utils/staffAuth.js";
 
 export default function StaffThread() {
   const { threadId } = useParams();
@@ -14,12 +15,13 @@ export default function StaffThread() {
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
-    if (!id) {
+    const token = localStorage.getItem("watag_staff_token");
+    if (!id || !token) {
       navigate("/staff");
       return;
     }
     setStaffId(id);
-    fetch(`/api/enquiries/threads?staffId=${id}`)
+    fetch(`/api/enquiries/threads`, { headers: staffAuthHeaders() })
       .then((res) => res.json())
       .then((threads) => {
         const match = threads.find((t) => String(t.id) === threadId);
@@ -35,7 +37,7 @@ export default function StaffThread() {
   return (
     <MessageThread
       threadId={threadId}
-      identity={{ type: "staff", staffId }}
+      identity={{ type: "staff", staffId, token: localStorage.getItem("watag_staff_token") }}
       otherName={otherName}
       subtitle={otherPhone}
       backTo="/staff/messages"

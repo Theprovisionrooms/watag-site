@@ -57,6 +57,19 @@ export default function Home() {
       >
         artist login
       </Link>
+
+      <Link
+        to="/legal"
+        style={{
+          alignSelf: "center",
+          fontSize: 11,
+          color: "var(--watag-text-dim)",
+          opacity: 0.6,
+          textDecoration: "none",
+        }}
+      >
+        privacy & cookies
+      </Link>
     </div>
   );
 }

@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavBack } from "../App.jsx";
+import { staffAuthHeaders } from "../utils/staffAuth.js";
 
 export default function StaffProfile() {
   const navigate = useNavigate();
@@ -26,7 +27,8 @@ export default function StaffProfile() {
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
-    if (!id) {
+    const token = localStorage.getItem("watag_staff_token");
+    if (!id || !token) {
       navigate("/staff");
       return;
     }
@@ -45,13 +47,12 @@ export default function StaffProfile() {
     setSaving(true);
     setSaved(false);
     const formData = new FormData();
-    formData.append("staffId", staffId);
     formData.append("name", name);
     formData.append("bio", bio);
     formData.append("calendarColor", color);
     if (fileInput.current.files[0]) formData.append("photo", fileInput.current.files[0]);
 
-    const res = await fetch("/api/staff/profile", { method: "POST", body: formData });
+    const res = await fetch("/api/staff/profile", { method: "POST", headers: staffAuthHeaders(), body: formData });
     const data = await res.json();
     if (data.photoUrl) setPhotoUrl(data.photoUrl);
     localStorage.setItem("watag_staff_name", name);
@@ -66,8 +67,8 @@ export default function StaffProfile() {
     setPinSaving(true);
     const res = await fetch("/api/staff/change-pin", {
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ staffId, currentPin, newPin }),
+      headers: { "content-type": "application/json", ...staffAuthHeaders() },
+      body: JSON.stringify({ currentPin, newPin }),
     });
     const data = await res.json();
     setPinSaving(false);
@@ -78,6 +79,17 @@ export default function StaffProfile() {
     setCurrentPin("");
     setNewPin("");
     setPinSaved(true);
+
+    // a changed PIN invalidates every session on the account, this one
+    // included, sign out locally and send them back to log in fresh
+    setTimeout(() => {
+      localStorage.removeItem("watag_staff_token");
+      localStorage.removeItem("watag_staff_id");
+      localStorage.removeItem("watag_staff_name");
+      localStorage.removeItem("watag_staff_color");
+      localStorage.removeItem("watag_staff_role");
+      navigate("/staff");
+    }, 1500);
   }
 
   return (

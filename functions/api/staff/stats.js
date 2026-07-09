@@ -1,18 +1,17 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 //
-// GET /api/staff/stats?staffId=1
-// Owner only. One honest note: there's no "mark this reward as
+// GET /api/staff/stats   Header: Authorization: Bearer <staff session token>
+// Owner only, verified against a real session token. One honest note: there's no "mark this reward as
 // actually handed over" action built anywhere yet, so this reports
 // stamps issued and rewards currently sitting pending, not a
 // historical redemption count, that table exists in the schema but
 // nothing writes to it yet.
 
-import { isOwner } from "../../_lib/session.js";
+import { isOwner, resolveStaffSession } from "../../_lib/session.js";
 
 export async function onRequestGet({ request, env }) {
-  const url = new URL(request.url);
-  const staffId = url.searchParams.get("staffId");
+  const staffId = await resolveStaffSession(request, env);
 
   if (!(await isOwner(env, staffId))) {
     return new Response(JSON.stringify({ error: "owner_only" }), {

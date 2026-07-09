@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavBack } from "../App.jsx";
+import { staffAuthHeaders } from "../utils/staffAuth.js";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -27,7 +28,8 @@ export default function StaffAvailability() {
 
   useEffect(() => {
     const id = localStorage.getItem("watag_staff_id");
-    if (!id) {
+    const token = localStorage.getItem("watag_staff_token");
+    if (!id || !token) {
       navigate("/staff");
       return;
     }
@@ -45,8 +47,8 @@ export default function StaffAvailability() {
     setSaving(true);
     await fetch("/api/staff/availability", {
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ staffId, ...form }),
+      headers: { "content-type": "application/json", ...staffAuthHeaders() },
+      body: JSON.stringify(form),
     });
     setSaving(false);
     loadBlocks(staffId);
@@ -55,7 +57,7 @@ export default function StaffAvailability() {
   async function removeBlock(id) {
     await fetch("/api/staff/availability", {
       method: "DELETE",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...staffAuthHeaders() },
       body: JSON.stringify({ id }),
     });
     loadBlocks(staffId);

@@ -1,16 +1,15 @@
 // WATAG — built by Sidedoor Digital
 // Intellectual property of Sidedoor Digital
 //
-// GET    /api/staff/products                              list everything, active and inactive, anyone signed in as staff can view
-// POST   /api/staff/products    multipart: staffId, name, description, price, image, loyaltyEligible    owner only
-// DELETE /api/staff/products    body: { staffId, productId }                                            owner only
+// GET    /api/staff/products                                            list everything, active and inactive, anyone signed in as staff can view
+// POST   /api/staff/products    Header: Authorization: Bearer <token>    multipart: name, description, price, image, loyaltyEligible    owner only
+// DELETE /api/staff/products    Header: Authorization: Bearer <token>    body: { productId }                                             owner only
 //
 // Owner-gated since this touches stock and pricing, money things.
-// staffId is trusted the same way it is everywhere else on the staff
-// side (a closed set of known people with their own PIN login), but
-// the role check itself is real, not just hidden by the frontend.
+// Caller identity comes from a verified staff session token, not a
+// staffId the request just claims, and the role check itself is real.
 
-import { isOwner } from "../../_lib/session.js";
+import { isOwner, resolveStaffSession } from "../../_lib/session.js";
 
 function safeFilename(name) {
   return name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
@@ -29,8 +28,7 @@ export async function onRequestGet({ env }) {
 }
 
 export async function onRequestPost({ request, env }) {
-  const formData = await request.formData();
-  const staffId = formData.get("staffId");
+  const staffId = await resolveStaffSession(request, env);
 
   if (!(await isOwner(env, staffId))) {
     return new Response(JSON.stringify({ error: "owner_only" }), {
@@ -39,6 +37,7 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
+  const formData = await request.formData();
   const name = formData.get("name");
   const description = formData.get("description") || "";
   const price = parseFloat(formData.get("price"));
@@ -79,7 +78,7 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestDelete({ request, env }) {
-  const { staffId, productId } = await request.json();
+  const staffId = await resolveStaffSession(request, env);
 
   if (!(await isOwner(env, staffId))) {
     return new Response(JSON.stringify({ error: "owner_only" }), {
@@ -88,6 +87,7 @@ export async function onRequestDelete({ request, env }) {
     });
   }
 
+  const { productId } = await request.json();
   if (!productId) {
     return new Response(JSON.stringify({ error: "productId required" }), {
       status: 400,

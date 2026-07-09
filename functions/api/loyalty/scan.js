@@ -2,6 +2,8 @@
 // Intellectual property of Sidedoor Digital
 //
 // POST /api/loyalty/scan
+// Header: Authorization: Bearer <staff session token>
+// Body: { token }
 // Staff scan a customer's QR through the in-app camera view, the decoded
 // token gets posted here. Validates the token, applies the stamp, and
 // flags a reward if the client has hit 3, 6 or 9 stamps.
@@ -20,6 +22,7 @@
 // just stamped and, if a referral completed, for the referrer.
 
 import { notifyOwner } from "../../_lib/webpush.js";
+import { resolveStaffSession } from "../../_lib/session.js";
 
 const STAMP_COOLDOWN_SECONDS = 120;
 
@@ -51,10 +54,18 @@ async function applyStamp(db, clientId, staffId) {
 }
 
 export async function onRequestPost({ request, env }) {
-  const { token, staffId } = await request.json();
+  const staffId = await resolveStaffSession(request, env);
+  if (!staffId) {
+    return new Response(JSON.stringify({ error: "not_signed_in" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
+  }
 
-  if (!token || !staffId) {
-    return new Response(JSON.stringify({ error: "token and staffId required" }), {
+  const { token } = await request.json();
+
+  if (!token) {
+    return new Response(JSON.stringify({ error: "token required" }), {
       status: 400,
       headers: { "content-type": "application/json" },
     });

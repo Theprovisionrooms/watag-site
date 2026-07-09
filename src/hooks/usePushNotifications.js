@@ -48,14 +48,14 @@ export function usePushNotifications({ staffId } = {}) {
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       });
 
-      const token = localStorage.getItem("watag_session_token");
+      const token = staffId ? localStorage.getItem("watag_staff_token") : localStorage.getItem("watag_session_token");
       await fetch("/api/push/subscribe", {
         method: "POST",
         headers: {
           "content-type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ staffId, subscription: subscription.toJSON() }),
+        body: JSON.stringify({ subscription: subscription.toJSON() }),
       });
 
       setSubscribed(true);
