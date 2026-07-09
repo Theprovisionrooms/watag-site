@@ -8,7 +8,7 @@
 import { NavBack } from "../App.jsx";
 
 // add a filename here for each photo dropped into /public/studio
-const STUDIO_IMAGES = [
+const STUDIO_IMAGES = ["image-1.JPG","image-2.JPG","image-3.JPG","image-4.JPG","image-5.JPG","image-6.JPG"
   // "chair-1.jpg",
   // "front-desk.jpg",
   // "wall-flash.jpg",
