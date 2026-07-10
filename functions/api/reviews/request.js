@@ -12,7 +12,7 @@
 import { resolveStaffSession } from "../../_lib/session.js";
 
 const GOOGLE_REVIEW_URL = "https://g.page/r/CYEZZgWtNcfBEAE/review";
-const RESEND_FROM = "WATAG <onboarding@resend.dev>"; // swap once a real domain is verified in Resend
+const RESEND_FROM = "WATAG <studio@watagapp.co.uk>";
 
 export async function onRequestPost({ request, env }) {
   const staffId = await resolveStaffSession(request, env);

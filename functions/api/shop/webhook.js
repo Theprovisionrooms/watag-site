@@ -55,7 +55,7 @@ export async function onRequestPost({ request, env }) {
           method: "POST",
           headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "content-type": "application/json" },
           body: JSON.stringify({
-            from: "WATAG <onboarding@resend.dev>", // swap once a real domain is verified in Resend
+            from: "WATAG <studio@watagapp.co.uk>",
             to: email,
             subject: "Order confirmed",
             text: `Your order's confirmed, ready to collect in studio. Order #${orderId}.`,

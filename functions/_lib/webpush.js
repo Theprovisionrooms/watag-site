@@ -50,7 +50,7 @@ async function getVapidAuthHeader(env, audience) {
   const payload = {
     aud: audience,
     exp: Math.floor(Date.now() / 1000) + 12 * 60 * 60,
-    sub: env.VAPID_SUBJECT || "mailto:hello@watag.co.uk",
+    sub: env.VAPID_SUBJECT || "mailto:studio@watagapp.co.uk",
   };
 
   const encHeader = bytesToBase64Url(new TextEncoder().encode(JSON.stringify(header)));

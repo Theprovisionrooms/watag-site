@@ -9,7 +9,7 @@
 // the Resend dashboard.
 
 const CODE_TTL_MINUTES = 10;
-const RESEND_FROM = "WATAG <onboarding@resend.dev>"; // swap once a real domain is verified in Resend
+const RESEND_FROM = "WATAG <studio@watagapp.co.uk>";
 
 export async function onRequestPost({ request, env }) {
   const { email } = await request.json();
