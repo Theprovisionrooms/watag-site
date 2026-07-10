@@ -17,6 +17,7 @@ export default function StaffScan() {
   const canvasRef = useRef(null);
   const navigate = useNavigate();
   const [staffId, setStaffId] = useState(null);
+  const [mode, setMode] = useState("stamp"); // stamp | redeem
   const [status, setStatus] = useState("scanning"); // scanning | submitting | success | error
   const [message, setMessage] = useState("");
   const [stampedClientId, setStampedClientId] = useState(null);
@@ -79,7 +80,8 @@ export default function StaffScan() {
     scanningRef.current = false;
     setStatus("submitting");
 
-    const res = await fetch("/api/loyalty/scan", {
+    const endpoint = mode === "redeem" ? "/api/loyalty/redeem" : "/api/loyalty/scan";
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: { "content-type": "application/json", ...staffAuthHeaders() },
       body: JSON.stringify({ token }),
@@ -93,8 +95,16 @@ export default function StaffScan() {
           ? `already stamped, wait ${data.retryAfterSeconds}s`
           : data.error === "token_expired"
           ? "code expired, ask them to refresh their card"
+          : data.error === "no_pending_reward"
+          ? "this client doesn't have a reward waiting"
+          : mode === "redeem"
+          ? "redeem didn't go through, try again"
           : "scan didn't go through, try again"
       );
+    } else if (mode === "redeem") {
+      setStatus("success");
+      setStampedClientId(data.clientId);
+      setMessage(`redeemed: ${data.redeemed.replace(/_/g, " ")}`);
     } else {
       setStatus("success");
       setStampedClientId(data.clientId);
@@ -122,10 +132,52 @@ export default function StaffScan() {
     scanningRef.current = true;
   }
 
+  function switchMode(next) {
+    if (status === "submitting") return;
+    setMode(next);
+    scanNext();
+  }
+
   return (
     <div className="watag-screen">
       <NavBack to="/staff/home" label="artist" />
       <h1>Scan card</h1>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <button
+          onClick={() => switchMode("stamp")}
+          style={{
+            flex: 1,
+            padding: "10px 0",
+            borderRadius: 8,
+            fontWeight: 700,
+            border: mode === "stamp" ? "1px solid var(--watag-cyan)" : "1px solid var(--watag-text-dim)",
+            background: mode === "stamp" ? "var(--watag-cyan)" : "none",
+            color: mode === "stamp" ? "#000" : "var(--watag-text-dim)",
+          }}
+        >
+          stamp
+        </button>
+        <button
+          onClick={() => switchMode("redeem")}
+          style={{
+            flex: 1,
+            padding: "10px 0",
+            borderRadius: 8,
+            fontWeight: 700,
+            border: mode === "redeem" ? "1px solid var(--watag-amber)" : "1px solid var(--watag-text-dim)",
+            background: mode === "redeem" ? "var(--watag-amber)" : "none",
+            color: mode === "redeem" ? "#000" : "var(--watag-text-dim)",
+          }}
+        >
+          redeem reward
+        </button>
+      </div>
+      {mode === "redeem" && (
+        <p style={{ color: "var(--watag-text-dim)", fontSize: 13, textAlign: "center", marginTop: -4 }}>
+          scanning in this mode hands over their reward, it won't add a stamp
+        </p>
+      )}
 
       <div
         className={status === "success" ? "watag-glitch-once" : ""}
@@ -164,23 +216,25 @@ export default function StaffScan() {
             {status === "submitting" && <span>checking...</span>}
             {status === "success" && (
               <>
-                <strong style={{ color: "var(--watag-cyan)", fontSize: 20 }}>stamped</strong>
+                <strong style={{ color: "var(--watag-cyan)", fontSize: 20 }}>{mode === "redeem" ? "redeemed" : "stamped"}</strong>
                 <span style={{ color: "var(--watag-text-dim)" }}>{message}</span>
                 <button onClick={scanNext} style={{ background: "var(--watag-cyan)", color: "#000", border: "none", borderRadius: 8, padding: "10px 20px", fontWeight: 700 }}>
                   scan next
                 </button>
-                <button
-                  onClick={sendReview}
-                  disabled={reviewState !== "idle"}
-                  style={{ background: "none", border: "1px solid var(--watag-amber)", color: "var(--watag-amber)", borderRadius: 8, padding: "8px 16px", fontSize: 13 }}
-                >
-                  {reviewState === "sent" ? "review request sent" : reviewState === "sending" ? "sending..." : "ask for a review"}
-                </button>
+                {mode === "stamp" && (
+                  <button
+                    onClick={sendReview}
+                    disabled={reviewState !== "idle"}
+                    style={{ background: "none", border: "1px solid var(--watag-amber)", color: "var(--watag-amber)", borderRadius: 8, padding: "8px 16px", fontSize: 13 }}
+                  >
+                    {reviewState === "sent" ? "review request sent" : reviewState === "sending" ? "sending..." : "ask for a review"}
+                  </button>
+                )}
               </>
             )}
             {status === "error" && (
               <>
-                <strong style={{ color: "var(--watag-pink)", fontSize: 20 }}>not stamped</strong>
+                <strong style={{ color: "var(--watag-pink)", fontSize: 20 }}>{mode === "redeem" ? "not redeemed" : "not stamped"}</strong>
                 <span style={{ color: "var(--watag-text-dim)" }}>{message}</span>
                 <button onClick={scanNext} style={{ background: "var(--watag-pink)", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontWeight: 700 }}>
                   try again

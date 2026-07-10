@@ -86,6 +86,10 @@ export default function StaffStats() {
         <StatBlock label="stamps this month" value={stats.loyalty.stampsThisMonth} />
       </div>
 
+      <div style={{ display: "flex", gap: 10 }}>
+        <StatBlock label="rewards redeemed this month" value={stats.loyalty.redeemedThisMonth} accent="var(--watag-cyan)" />
+      </div>
+
       {stats.loyalty.pendingRewards.length > 0 && (
         <div className="watag-card">
           <strong style={{ fontSize: 13 }}>Rewards waiting to be redeemed</strong>

@@ -7,6 +7,7 @@
 // No longer takes a clientId from the caller, that was spoofable.
 
 import { resolveClientSession } from "../../_lib/session.js";
+import { TIER_REWARDS } from "../../_lib/loyalty.js";
 
 export async function onRequestGet({ request, env }) {
   const clientId = await resolveClientSession(request, env);
@@ -33,7 +34,7 @@ export async function onRequestGet({ request, env }) {
       stampCount: card.stamp_count,
       pendingReward: card.pending_reward,
       lastStampedAt: card.last_stamped_at,
-      tiers: { 3: "small_tattoo", 6: "watag_hoodie", 9: "in_store_credit" },
+      tiers: TIER_REWARDS,
     }),
     { headers: { "content-type": "application/json" } }
   );

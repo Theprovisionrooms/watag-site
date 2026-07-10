@@ -23,14 +23,9 @@
 
 import { notifyOwner } from "../../_lib/webpush.js";
 import { resolveStaffSession } from "../../_lib/session.js";
+import { TIER_REWARDS } from "../../_lib/loyalty.js";
 
 const STAMP_COOLDOWN_SECONDS = 120;
-
-const TIER_REWARDS = {
-  3: "small_tattoo",
-  6: "watag_hoodie",
-  9: "in_store_credit",
-};
 
 async function applyStamp(db, clientId, staffId) {
   let card = await db.prepare(`SELECT * FROM loyalty_cards WHERE client_id = ?`).bind(clientId).first();
@@ -41,7 +36,10 @@ async function applyStamp(db, clientId, staffId) {
   }
 
   const newCount = card.stamp_count + 1;
-  const reward = TIER_REWARDS[newCount] || null;
+  // a newly hit tier always wins, but if they're just between tiers,
+  // keep whatever reward was already pending rather than clearing it,
+  // an unredeemed reward should never quietly disappear on the next visit
+  const reward = TIER_REWARDS[newCount] || card.pending_reward || null;
 
   await db
     .prepare(`UPDATE loyalty_cards SET stamp_count = ?, pending_reward = ?, last_stamped_at = datetime('now') WHERE client_id = ?`)

@@ -2,11 +2,7 @@
 // Intellectual property of Sidedoor Digital
 //
 // GET /api/staff/stats   Header: Authorization: Bearer <staff session token>
-// Owner only, verified against a real session token. One honest note: there's no "mark this reward as
-// actually handed over" action built anywhere yet, so this reports
-// stamps issued and rewards currently sitting pending, not a
-// historical redemption count, that table exists in the schema but
-// nothing writes to it yet.
+// Owner only, verified against a real session token.
 
 import { isOwner, resolveStaffSession } from "../../_lib/session.js";
 
@@ -49,6 +45,9 @@ export async function onRequestGet({ request, env }) {
   const pendingRewards = await db.prepare(
     `SELECT pending_reward, COUNT(*) AS total FROM loyalty_cards WHERE pending_reward IS NOT NULL GROUP BY pending_reward`
   ).all();
+  const redeemedThisMonth = await db.prepare(
+    `SELECT COUNT(*) AS total FROM loyalty_redemptions WHERE redeemed_at >= date('now', 'start of month')`
+  ).first();
 
   const enquiryThreads = await db.prepare(`SELECT COUNT(*) AS total FROM enquiry_threads`).first();
   const messagesThisWeek = await db.prepare(
@@ -70,6 +69,7 @@ export async function onRequestGet({ request, env }) {
         stampsTotal: stampsTotal.total,
         stampsThisMonth: stampsThisMonth.total,
         pendingRewards: pendingRewards.results,
+        redeemedThisMonth: redeemedThisMonth.total,
       },
       enquiries: { threadCount: enquiryThreads.total, messagesThisWeek: messagesThisWeek.total },
       reviewNudges: { sent: reviewNudges.sent || 0, clicked: reviewNudges.clicked || 0 },
