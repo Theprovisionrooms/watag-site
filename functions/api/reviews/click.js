@@ -3,8 +3,7 @@
 //
 // GET /api/reviews/click?id=123
 // Records that a review nudge was actually clicked, then redirects to
-// the real Google review page. Swap GOOGLE_REVIEW_URL once Jay's real
-// Google Business Profile link is in hand.
+// the real Google review page.
 
 const GOOGLE_REVIEW_URL = "https://g.page/r/CYEZZgWtNcfBEAE/review";
 

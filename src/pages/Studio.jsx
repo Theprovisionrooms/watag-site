@@ -6,6 +6,7 @@
 // Jay drops into /public/studio and lists below, no ackend needed.
 
 import { NavBack } from "../App.jsx";
+import GalleryCarousel from "../components/GalleryCarousel.jsx";
 
 // add a filename here for each photo dropped into /public/studio
 const STUDIO_IMAGES = ["image-1.jpg","image-2.jpg","image-3.jpg","image-4.jpg","image-5.jpg","image-6.jpg"
@@ -20,20 +21,10 @@ export default function Studio() {
       <NavBack />
       <h1>Inside the studio</h1>
 
-      {STUDIO_IMAGES.length === 0 && (
-        <p style={{ color: "var(--watag-text-dim)", textAlign: "center" }}>photos coming soon</p>
-      )}
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        {STUDIO_IMAGES.map((file) => (
-          <img
-            key={file}
-            src={`/studio/${file}`}
-            alt=""
-            style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 10 }}
-          />
-        ))}
-      </div>
+      <GalleryCarousel
+        images={STUDIO_IMAGES.map((file) => ({ id: file, src: `/studio/${file}`, alt: "" }))}
+        emptyMessage="photos coming soon"
+      />
     </div>
   );
 }

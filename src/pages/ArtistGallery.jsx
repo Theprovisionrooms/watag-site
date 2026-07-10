@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { NavBack } from "../App.jsx";
+import GalleryCarousel from "../components/GalleryCarousel.jsx";
 
 export default function ArtistGallery() {
   const { staffId } = useParams();
@@ -27,18 +28,9 @@ export default function ArtistGallery() {
       <NavBack to="/artists" label="artists" />
       <h1>{artist?.name || "Gallery"}</h1>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        {images.map((img) => (
-          <img
-            key={img.id}
-            src={`/media/${img.image_url}`}
-            alt={img.caption || ""}
-            style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 10 }}
-          />
-        ))}
-      </div>
-
-      {images.length === 0 && <p style={{ color: "var(--watag-text-dim)", textAlign: "center" }}>nothing uploaded yet</p>}
+      <GalleryCarousel
+        images={images.map((img) => ({ id: img.id, src: `/media/${img.image_url}`, alt: img.caption || "" }))}
+      />
     </div>
   );
 }

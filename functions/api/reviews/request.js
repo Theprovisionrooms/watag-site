@@ -6,8 +6,6 @@
 // Body: { clientId }
 // Sends an email asking for a Google review, with a link that goes
 // through our own redirect first so we know if it was actually clicked.
-// Needs GOOGLE_REVIEW_URL swapped for Jay's real Google Business Profile
-// review link, currently a placeholder.
 
 import { resolveStaffSession } from "../../_lib/session.js";
 

@@ -177,27 +177,28 @@ wrangler d1 execute watag-db --file=./migrations/006_push_subscriptions.sql --re
 
 ## genuinely outstanding, needs Jay or a setup step, not more code
 
-- Resend domain isn't verified yet. Until it is, no real email actually sends (login codes, order confirmations, review nudges), they're all on Resend's test domain right now. `request-code.js`, `webhook.js`, and `reviews/request.js` all need the sender address swapped once a domain's verified.
-- `GOOGLE_REVIEW_URL` is a placeholder in two files (`reviews/request.js`, `reviews/click.js`), needs Jay's real Google Business Profile review link.
-- **All 3 seeded artist accounts are still on PIN `1234`.** The change-PIN feature exists at `/staff/profile`, each artist needs to actually use it.
+- **All 3 seeded artist accounts are still on PIN `1234`** in `seed.sql`. The change-PIN feature exists at `/staff/profile`, each artist needs to actually use it if they haven't already.
 - Migration 004 assumed staff id 1 was Jay and marked that row `owner`. Worth confirming it landed on the right person, easy one-line fix if not: `UPDATE staff SET role = 'owner' WHERE id = X`.
-- Jay hasn't confirmed which merch items count toward the 6-stamp loyalty reward, the checkbox exists in the product form, just needs his call.
+- Jay hasn't confirmed which merch items count toward the 9-stamp loyalty reward, the checkbox exists in the product form, just needs his call.
 - No "mark this reward as actually handed over" action exists anywhere. The stats dashboard shows stamps issued and rewards currently pending, not a redemption history, `loyalty_redemptions` sits unused in the schema. Worth building if Jay wants that history properly tracked.
 - Enquiry threads are text only, the schema's ready for letting a client attach one of the artist's own gallery photos as a reference (`gallery_ref_id`), just no picker UI built yet, low priority.
 - The icon-grid treatment only covers the two main home screens so far (client and artist). Same icon language could extend to smaller in-page links if wanted.
-- **VAPID keys need generating for the live deployment**, the setup section above has the exact steps. Without them, push notifications silently do nothing, the toggle UI works but nothing actually sends.
-- **Setback font file needs adding** at `public/fonts/Setback.ttf`, see the "fonts" section above for exactly where to get it. Headings fall back to Barlow Condensed cleanly until then.
 
 ## fonts
 
-Headings now use **Setback TT BRK**, by Ænigma Fonts, a bitmap/stencil display face, free for commercial use, confirmed directly on the publisher's page. Not bundled in this repo, third-party font files are best grabbed from the source directly rather than redistributed through a client's codebase. To finish setting it up:
+Headings use **Setback TT BRK**, by Ænigma Fonts, a bitmap/stencil display face, free for commercial use. `Setback.ttf` and a converted `Setback.woff2` both live at `public/fonts/`, `@font-face` in `global.css` loads the woff2 first with the ttf as fallback. Nothing left to do here.
 
-1. Download it from **https://www.1001fonts.com/setback-tt-brk-font.html**
-2. Take the `.ttf` file out of the zip, rename it `Setback.ttf`
-3. Drop it at `public/fonts/Setback.ttf`
-4. Commit and push, it'll pick up automatically, `@font-face` is already wired in `global.css`
+## domain and email
 
-Until that file's in place, headings fall back to Barlow Condensed cleanly, nothing breaks either way, this genuinely is a drop-in-and-go step whenever it's convenient.
+Live at **watagapp.co.uk**, connected through Cloudflare Pages. DKIM and SPF are set up for Resend against that domain, so login codes, order confirmations, and review nudges all send from a real, authenticated `studio@watagapp.co.uk` rather than Resend's test domain.
+
+## push notifications, live
+
+VAPID keys are generated and set, `VITE_VAPID_PUBLIC_KEY`/`VAPID_PUBLIC_KEY` in `wrangler.toml`, `VAPID_PRIVATE_KEY` as a Pages secret. Push works end to end, stamp/reward, referral bonus, new enquiry message, waitlist match.
+
+## galleries, this session
+
+Both the studio gallery (`/studio`) and each artist's public gallery (`/artists/:id/gallery`) moved from a static grid to a swipeable carousel, `src/components/GalleryCarousel.jsx`. Native CSS scroll-snap rather than a drag library, that's what makes the swipe feel free on a phone without adding a dependency. One photo full width per slide with a peek of the next one's edge so it reads as swipeable at a glance, dot pagination below tracks position via `IntersectionObserver`, small arrow buttons for anyone on a trackpad or mouse. Everything respects `prefers-reduced-motion`. The artist's own gallery management screen at `/staff/gallery` stays a plain grid on purpose, that's an upload/delete tool, not a browsing experience, a carousel would only get in the way there.
 
 ## wordmark
 

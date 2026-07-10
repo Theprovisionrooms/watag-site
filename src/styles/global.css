@@ -369,3 +369,110 @@ a {
     animation: none;
   }
 }
+
+/* Gallery carousel, studio gallery and each artist's public gallery.
+   Native scroll-snap, one photo full width per slide, a peek of the
+   next slide's edge so it reads as swipeable at a glance rather than
+   looking like a single static photo. */
+.watag-carousel {
+  position: relative;
+  margin: 0 -20px;
+}
+
+.watag-carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  gap: 14px;
+  padding: 4px 32px 18px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.watag-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.watag-carousel-slide {
+  flex: 0 0 84%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--watag-border);
+  background: var(--watag-bg-raised);
+  position: relative;
+}
+
+.watag-carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.watag-carousel-arrow {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--watag-border);
+  background: rgba(10, 10, 18, 0.65);
+  color: var(--watag-text);
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.watag-carousel-arrow:disabled {
+  opacity: 0.3;
+}
+
+.watag-carousel-arrow-left {
+  left: 30px;
+}
+
+.watag-carousel-arrow-right {
+  right: 30px;
+}
+
+.watag-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: -8px;
+}
+
+.watag-carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: none;
+  background: var(--watag-text-dim);
+  opacity: 0.5;
+  padding: 0;
+  transition: opacity 0.2s ease, width 0.2s ease, background 0.2s ease;
+}
+
+.watag-carousel-dot.is-active {
+  opacity: 1;
+  width: 18px;
+  border-radius: 3px;
+  background: var(--watag-cyan);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watag-carousel-track {
+    scroll-behavior: auto;
+  }
+  .watag-carousel-dot {
+    transition: none;
+  }
+}
