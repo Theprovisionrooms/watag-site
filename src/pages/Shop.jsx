@@ -40,22 +40,41 @@ export default function Shop() {
   async function checkout() {
     setError(null);
     setCheckingOut(true);
-    const token = localStorage.getItem("watag_session_token");
-    const res = await fetch("/api/shop/checkout", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({ items: cartItems.map((i) => ({ productId: Number(i.product.id), quantity: i.quantity })) }),
-    });
-    const data = await res.json();
-    setCheckingOut(false);
-    if (!res.ok) {
-      setError(data.detail || "checkout didn't go through, try again");
-      return;
+    try {
+      const token = localStorage.getItem("watag_session_token");
+      const res = await fetch("/api/shop/checkout", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ items: cartItems.map((i) => ({ productId: Number(i.product.id), quantity: i.quantity })) }),
+      });
+
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        // server didn't return JSON at all, a crash or a Cloudflare
+        // error page, either way there's nothing usable to redirect to
+        throw new Error(`checkout failed (${res.status})`);
+      }
+
+      if (!res.ok) {
+        setError(data.detail || data.error || "checkout didn't go through, try again");
+        return;
+      }
+      if (!data.url) {
+        setError("checkout didn't go through, try again");
+        return;
+      }
+      window.location.href = data.url;
+    } catch (err) {
+      setError("checkout didn't go through, try again");
+      console.error("checkout error", err);
+    } finally {
+      setCheckingOut(false);
     }
-    window.location.href = data.url;
   }
 
   return (
