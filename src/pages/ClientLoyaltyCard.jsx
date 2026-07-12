@@ -136,9 +136,6 @@ function ProfileEntry({ onVerified }) {
     <div className="watag-screen">
       <NavBack />
       <h1>Find your card</h1>
-      <p style={{ color: "var(--watag-text-dim)" }}>
-        This is only needed once on this phone. After this you're straight in every time, no code, no typing.
-      </p>
       <div className="watag-card" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <input
           type="text"

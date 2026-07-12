@@ -4,9 +4,7 @@
 // POST /api/clients/request-code
 // Body: { email }
 // Sends a 6 digit code valid for 10 minutes. Needs RESEND_API_KEY set
-// as a secret. Sends from Resend's own test domain for now, swap
-// RESEND_FROM below for a real verified domain once one's set up in
-// the Resend dashboard.
+// as a secret, sending from the verified studio domain below.
 
 const CODE_TTL_MINUTES = 10;
 const RESEND_FROM = "WATAG <studio@watagapp.co.uk>";
