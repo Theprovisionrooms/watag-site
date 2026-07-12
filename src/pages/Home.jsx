@@ -13,6 +13,7 @@ import {
   GiftIcon,
   AftercareIcon,
   CameraIcon,
+  ChatIcon,
 } from "../components/icons.jsx";
 
 export default function Home() {
@@ -41,6 +42,7 @@ export default function Home() {
         <NavTile index={4} to="/referrals" icon={<GiftIcon />} label="Refer a friend" />
         <NavTile index={5} to="/aftercare" icon={<AftercareIcon />} label="Aftercare guide" />
         <NavTile index={6} to="/studio" icon={<CameraIcon />} label="Inside the studio" />
+        <NavTile index={7} to="/messages" icon={<ChatIcon />} label="Inbox" />
         <NotificationToggle />
       </div>
 
