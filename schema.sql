@@ -26,7 +26,8 @@ CREATE TABLE staff_availability (
   start_time TEXT NOT NULL,           -- HH:MM
   end_time TEXT NOT NULL,             -- HH:MM
   status TEXT DEFAULT 'available',    -- available | booked | off
-  notes TEXT,
+  notes TEXT,                         -- public, shown on the client-facing rota
+  staff_notes TEXT,                   -- private, artists only, never sent to public endpoint
   created_at TEXT DEFAULT (datetime('now'))
 );
 

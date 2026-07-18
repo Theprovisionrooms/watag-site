@@ -75,11 +75,14 @@ export default function Calendar() {
               .map((b) => {
                 const member = staff.find((s) => s.id === b.staff_id);
                 return (
-                  <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
-                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: b.calendar_color, flexShrink: 0 }} />
+                  <div key={b.id} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "4px 0" }}>
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: b.calendar_color, flexShrink: 0, marginTop: 5 }} />
                     <span style={{ fontSize: 14 }}>
                       {member?.name || "artist"} · {b.start_time}–{b.end_time}
                       {b.status === "booked" && <span style={{ color: "var(--watag-text-dim)" }}> · booked</span>}
+                      {b.notes && (
+                        <span style={{ display: "block", fontSize: 12, color: "var(--watag-text-dim)" }}>{b.notes}</span>
+                      )}
                     </span>
                   </div>
                 );

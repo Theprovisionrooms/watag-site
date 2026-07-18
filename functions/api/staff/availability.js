@@ -4,10 +4,15 @@
 // GET  /api/staff/availability?staffId=1&from=2026-06-23&to=2026-06-29
 //      Public, used by the client-facing calendar too. Returns
 //      availability blocks for a staff member over a date range.
+//      `notes` is public and always included. `staff_notes` is
+//      artist-only and only included when the request carries a
+//      valid staff session, stripped out for anonymous callers.
 //
 // POST /api/staff/availability   Header: Authorization: Bearer <staff session token>
-//      Body: { date, startTime, endTime, status }
+//      Body: { date, startTime, endTime, status, notes, staffNotes }
 //      A staff member sets or updates their own availability block.
+//      `notes` shows up on the public rota (e.g. "guest artist in
+//      today"), `staffNotes` is only ever visible to signed-in staff.
 //      If the slot's status is "available" and someone's on the
 //      waitlist for that date (with this artist specifically, or
 //      happy with any artist), they get pinged.
@@ -38,7 +43,15 @@ export async function onRequestGet({ request, env }) {
     .bind(staffId, from, to)
     .all();
 
-  return new Response(JSON.stringify(rows.results), {
+  // this endpoint is public (the client rota calls it too), so
+  // staff_notes only goes out when the caller can prove they're
+  // signed in as staff, anonymous callers never see it
+  const requesterStaffId = await resolveStaffSession(request, env);
+  const results = requesterStaffId
+    ? rows.results
+    : rows.results.map(({ staff_notes, ...rest }) => rest);
+
+  return new Response(JSON.stringify(results), {
     headers: { "content-type": "application/json" },
   });
 }
@@ -52,7 +65,7 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
-  const { date, startTime, endTime, status, notes } = await request.json();
+  const { date, startTime, endTime, status, notes, staffNotes } = await request.json();
   const staffId = sessionStaffId;
 
   if (!date || !startTime || !endTime) {
@@ -63,10 +76,10 @@ export async function onRequestPost({ request, env }) {
   }
 
   const result = await env.WATAG_DB.prepare(
-    `INSERT INTO staff_availability (staff_id, date, start_time, end_time, status, notes)
-     VALUES (?, ?, ?, ?, ?, ?)`
+    `INSERT INTO staff_availability (staff_id, date, start_time, end_time, status, notes, staff_notes)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
   )
-    .bind(staffId, date, startTime, endTime, status || "available", notes || null)
+    .bind(staffId, date, startTime, endTime, status || "available", notes || null, staffNotes || null)
     .run();
 
   if ((status || "available") === "available") {

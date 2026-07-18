@@ -23,7 +23,14 @@ export default function StaffAvailability() {
   const [staffId, setStaffId] = useState(null);
   const [color, setColor] = useState("#E91E8C");
   const [blocks, setBlocks] = useState([]);
-  const [form, setForm] = useState({ date: todayISO(), startTime: "10:00", endTime: "18:00", status: "available" });
+  const [form, setForm] = useState({
+    date: todayISO(),
+    startTime: "10:00",
+    endTime: "18:00",
+    status: "available",
+    notes: "",
+    staffNotes: "",
+  });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -51,6 +58,7 @@ export default function StaffAvailability() {
       body: JSON.stringify(form),
     });
     setSaving(false);
+    setForm((f) => ({ ...f, notes: "", staffNotes: "" }));
     loadBlocks(staffId);
   }
 
@@ -102,6 +110,20 @@ export default function StaffAvailability() {
           <option value="booked">booked</option>
           <option value="off">off</option>
         </select>
+        <input
+          type="text"
+          placeholder="note for clients, shows on the public calendar (optional)"
+          value={form.notes}
+          onChange={(e) => setForm({ ...form, notes: e.target.value })}
+          style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 10, borderRadius: 8, fontSize: 13 }}
+        />
+        <input
+          type="text"
+          placeholder="private note, artists only, never shown to clients (optional)"
+          value={form.staffNotes}
+          onChange={(e) => setForm({ ...form, staffNotes: e.target.value })}
+          style={{ background: "transparent", border: "1px solid var(--watag-border)", color: "var(--watag-text)", padding: 10, borderRadius: 8, fontSize: 13 }}
+        />
         <button
           onClick={addBlock}
           disabled={saving}
@@ -116,14 +138,22 @@ export default function StaffAvailability() {
           <div
             key={b.id}
             className="watag-card"
-            style={{ borderLeft: `4px solid ${color}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}
+            style={{ borderLeft: `4px solid ${color}`, display: "flex", flexDirection: "column", gap: 4 }}
           >
-            <span>
-              {b.date} · {b.start_time}–{b.end_time} · {b.status}
-            </span>
-            <button onClick={() => removeBlock(b.id)} style={{ background: "none", border: "none", color: "var(--watag-text-dim)" }}>
-              remove
-            </button>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span>
+                {b.date} · {b.start_time}–{b.end_time} · {b.status}
+              </span>
+              <button onClick={() => removeBlock(b.id)} style={{ background: "none", border: "none", color: "var(--watag-text-dim)" }}>
+                remove
+              </button>
+            </div>
+            {b.notes && (
+              <span style={{ fontSize: 12, color: "var(--watag-text-dim)" }}>public note: {b.notes}</span>
+            )}
+            {b.staff_notes && (
+              <span style={{ fontSize: 12, color: "var(--watag-amber)" }}>private note: {b.staff_notes}</span>
+            )}
           </div>
         ))}
         {blocks.length === 0 && <p style={{ color: "var(--watag-text-dim)", textAlign: "center" }}>no slots added yet</p>}

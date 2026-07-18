@@ -9,21 +9,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { NavBack } from "../App.jsx";
+import { REWARD_LABELS } from "../utils/rewardLabels.js";
 
 const TOKEN_TTL = 60;
 const TIERS = [
-  { count: 3, label: "small tattoo" },
+  { count: 3, label: "£30 voucher" },
   { count: 6, label: "watag hoodie" },
   { count: 9, label: "£100 credit" },
 ];
-
-// keys match what the backend sends back as pendingReward, this is
-// just the human-readable version for the banner up top
-const REWARD_LABELS = {
-  small_tattoo: "small tattoo",
-  watag_hoodie: "WATAG hoodie",
-  in_store_credit: "£100 in-store credit",
-};
 
 function useSession() {
   const [session, setSession] = useState(() => ({

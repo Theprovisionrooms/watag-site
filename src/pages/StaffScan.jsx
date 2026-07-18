@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import jsQR from "jsqr";
 import { NavBack } from "../App.jsx";
 import { staffAuthHeaders } from "../utils/staffAuth.js";
+import { rewardLabel } from "../utils/rewardLabels.js";
 
 export default function StaffScan() {
   const videoRef = useRef(null);
@@ -104,12 +105,12 @@ export default function StaffScan() {
     } else if (mode === "redeem") {
       setStatus("success");
       setStampedClientId(data.clientId);
-      setMessage(`redeemed: ${data.redeemed.replace(/_/g, " ")}`);
+      setMessage(`redeemed: ${rewardLabel(data.redeemed)}`);
     } else {
       setStatus("success");
       setStampedClientId(data.clientId);
       const base = data.pendingReward
-        ? `stamp ${data.stampCount}/9, reward ready: ${data.pendingReward.replace(/_/g, " ")}`
+        ? `stamp ${data.stampCount}/9, reward ready: ${rewardLabel(data.pendingReward)}`
         : `stamp ${data.stampCount}/9`;
       setMessage(data.referralCompleted ? `${base} · this was a referral, the referrer just got a bonus stamp` : base);
     }
