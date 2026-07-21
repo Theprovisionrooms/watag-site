@@ -72,6 +72,22 @@ export default function Home() {
       >
         privacy & cookies
       </Link>
+
+      <a
+        href="https://getsidedoor.co.uk"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          alignSelf: "center",
+          fontSize: 11,
+          color: "var(--watag-text-dim)",
+          opacity: 0.6,
+          textDecoration: "none",
+          marginTop: 4,
+        }}
+      >
+        built by Sidedoor Digital
+      </a>
     </div>
   );
 }
